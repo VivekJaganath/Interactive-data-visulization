@@ -1,0 +1,7 @@
+pandas
+dash
+dash-bootstrap-components
+dash-html-components
+dash-table
+plotly
+plotly.express
