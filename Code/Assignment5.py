@@ -3,33 +3,57 @@ import plotly.express as px
 
 import json
 import dash
+import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
-app = dash.Dash(__name__)
+app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+app.title = "IDV Mini-Project-COVID"
 
-df = pd.read_csv("owid-covid-data.csv")
-search_df_europe = df['continent'] == 'Europe'
-df_europe = df[search_df_europe]
-formatted_df_europe = df_europe.groupby(['date', 'location', 'iso_code'])['total_cases', 'total_deaths'].max()
-formatted_df_europe = formatted_df_europe.reset_index()
-print(formatted_df_europe)
 with open('europe_geo.json') as json_file:
     europe_geo_json = json.load(json_file)
 
-#----------------
+df_world = pd.read_csv("owid-covid-data.csv")
+search_df_europe = df_world['continent'] == 'Europe'
+df_europe = df_world[search_df_europe]
+df_europe = df_europe.rename({'location': 'country'}, axis=1)
+df_europe_cases = df_europe.groupby(['date', 'country'])['total_cases', 'total_deaths'].max()
+df_europe_cases = df_europe_cases.reset_index()
+df_europe_cases['date'] = pd.to_datetime(df_europe_cases['date'])
+df_europe_cases['date'] = df_europe_cases['date'].dt.strftime('%B %d, %Y')
+#print(df_europe_cases)
+
+df_recovered = pd.read_csv("time_series_covid19_recovered_global.csv")
+del df_recovered['Province/State']
+del df_recovered['Lat']
+del df_recovered['Long']
+df_recovered = df_recovered.rename({'Country/Region': 'country'}, axis=1)
+df_recovered = df_recovered.groupby(['country']).sum()
+df_recovered = df_recovered.reset_index()
+df_recovered = pd.melt(df_recovered, id_vars=["country"], var_name="date", value_name="total_recovery")
+df_recovered['total_recovery'] = df_recovered['total_recovery'].astype(float)
+df_recovered['date'] = pd.to_datetime(df_recovered['date'])
+df_recovered['date'] = df_recovered['date'].dt.strftime('%B %d, %Y')
+
+df_merged = pd.merge(df_europe_cases, df_recovered, on=['country', 'date'])
+
 app.layout = html.Div([
-    html.Div(dcc.Graph(id='the_graph'), className='six columns'),
-    html.Div([html.Br(), html.Label(['Choose country:'], style={'font-weight': 'bold', "text-align": "left"}),
+    html.Div([dcc.Graph(id='the_graph'),
+              html.Label(['Choose cases:'], style={'font-weight': 'bold', "text-align": "left"}),
+              dcc.Dropdown(id='cases',
+                           options=[{'label': 'Confirmed', 'value': 'C'}, {'label': 'Death', 'value': 'D'},
+                                    {'label': 'Recovered', 'value': 'R'}],
+                           value='C', clearable=True, searchable=True,
+                           placeholder='Choose Cases...', style={'height': '30px', 'width': '200px'})],
+             className='six columns'),
+    html.Div([dcc.Graph(id='line_graph'),
+              html.Label(['Choose country:'], style={'font-weight': 'bold', "text-align": "left"}),
               dcc.Dropdown(id='country',
-                           options=[{'label': x, 'value': x} for x in formatted_df_europe.sort_values('location')
-                           ['location'].unique()], value='Austria', multi=False, disabled=False, clearable=True,
-                           searchable=True, placeholder='Choose Country...', className='form-dropdown',
-                           style={'width': "80%"}, persistence='string', persistence_type='memory'),
-              dcc.Graph(id='line_graph'),
-              ],
-             className='two columns'),
+                           options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
+                           ['country'].unique()], value='Albania', clearable=True, searchable=True,
+                           placeholder='Choose Country...', style={'height': '30px', 'width': '200px'},)
+              ], className='five columns')
     ])
 #----------------
 
@@ -39,21 +63,41 @@ app.layout = html.Div([
     [Input('country', 'value')])
 
 def build_graph(country_input):
-    df_per_country = formatted_df_europe[(formatted_df_europe['location'] == country_input)]
-    fig = px.line(df_per_country, x="date", y=["total_cases", "total_deaths"], height=600, width=1000)
+    df_per_country = df_merged[(df_merged['country'] == country_input)]
+    df_per_country = df_per_country.rename({'total_cases': 'total_cases_'+country_input,
+                                            'total_deaths': 'total_deaths_'+country_input,
+                                            'total_recovery': 'total_recovery_'+country_input}, axis=1)
+    df_germany = df_merged[(df_merged['country'] == "Germany")]
+    df_germany = df_germany.rename({'total_cases': 'total_cases_Germany', 'total_deaths': 'total_deaths_Germany',
+                                    'total_recovery': 'total_recovery_Germany'},  axis=1)
+    df_merge = pd.merge(df_germany, df_per_country, on='date')
+    #print(df_merge.to_string())
+    df_merge = pd.DataFrame(df_merge)
+    fig = px.line(df_merge, x='date', y=["total_cases_Germany", "total_deaths_Germany", "total_recovery_Germany",
+                                         "total_cases_"+country_input, "total_deaths_"+country_input,
+                                         "total_recovery_"+country_input],
+                  height=720, width=980, title='Comparing COVID cases of '+country_input+' against Germany',
+                  template='plotly_dark')
+    fig.update_layout(title=dict(font=dict(size=20)))
     return fig
 
 
 @app.callback(
     Output(component_id='the_graph', component_property='figure'),
-    [Input('country', 'value')])
+    [Input('cases', 'value')])
 
-def build_map(some_input):
-    fig_map = px.choropleth(data_frame=formatted_df_europe, geojson=europe_geo_json, locations='location',
-                            scope="europe", color="total_cases", hover_name='location', featureidkey='properties.name',
-                            projection="natural earth", color_continuous_scale=px.colors.sequential.Plasma,
-                            title='Total COVID-19 Cases Across Europe',
-                            width=1000, height=700)
+def build_map(case):
+    if case == 'R':
+        case_chosen = 'total_recovery'
+    elif case == 'D':
+        case_chosen = 'total_deaths'
+    else:
+        case_chosen = 'total_cases'
+
+    fig_map = px.choropleth(data_frame=df_merged, geojson=europe_geo_json, locations='country',
+                            scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
+                            projection="natural earth", color_continuous_scale=px.colors.sequential.Rainbow,
+                            title='Total COVID-19 Cases Across Europe', width=1050, height=720, template='plotly_dark')
 
     fig_map.update_layout(title=dict(font=dict(size=20)))
     return fig_map
