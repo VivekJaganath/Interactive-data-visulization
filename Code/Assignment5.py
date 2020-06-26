@@ -8,8 +8,14 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+
+#app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "IDV Mini-Project-COVID"
+
+
+#json_file = "europe_geo.json"
 
 with open('europe_geo.json') as json_file:
     europe_geo_json = json.load(json_file)
@@ -38,7 +44,18 @@ df_recovered['date'] = df_recovered['date'].dt.strftime('%B %d, %Y')
 
 df_merged = pd.merge(df_europe_cases, df_recovered, on=['country', 'date'])
 
+
+colors = {
+    'background': '#F0FFFF',
+    'text': '#7FDBFF'
+}
+
 app.layout = html.Div([
+    html.H1("IDV Mini-Project COVID-19",
+            style = {
+                'textAlign' : 'center',
+                'color' : colors['text']
+            }),
     html.Div([dcc.Graph(id='the_graph'),
               html.Label(['Choose cases:'], style={'font-weight': 'bold', "text-align": "left"}),
               dcc.Dropdown(id='cases',
