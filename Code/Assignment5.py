@@ -203,16 +203,28 @@ def build_graph1(country_input,govt_rest):
     # Country_data2 = DataSet2[(DataSet2['country'] == country_input)]
     German_data = German_data.rename({'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
                                    'C6_Stay at home requirements': 'StayHomeRestriction_Germany', 'C4_Restrictions on gatherings': 'GatherRestriction_Germany',
-                                   'C5_Close public transport':'TransportRestriction_Germany','C8_International travel controls':'InternationalTravelRestriction_Germany'}, axis=1)
+                                   'C5_Close public transport':'TransportRestriction_Germany','C8_International travel controls':'InternationalTravelRestriction_Germany','retail_and_recreation_percent_change_from_baseline':'Retail_Restriction_Germany',
+                                        'grocery_and_pharmacy_percent_change_from_baseline':'Grocery_Pharmacy_Restriction_Germany',
+                                        'parks_percent_change_from_baseline':'Park_Restriction_Germany'}, axis=1)
     Country_data = Country_data.rename({'C1_School closing': 'SchoolClosing_'+country_input, 'C2_Workplace closing': 'WorkPlaceClosing_'+country_input,
                                    'C6_Stay at home requirements': 'StayHomeRestriction_'+country_input, 'C4_Restrictions on gatherings': 'GatherRestriction_'+country_input,
                                    'C5_Close public transport':'TransportRestriction_'+country_input,
-                                   'C8_International travel controls':'InternationalTravelRestriction_'+country_input}, axis=1)
+                                   'C8_International travel controls':'InternationalTravelRestriction_'+country_input,'retail_and_recreation_percent_change_from_baseline':'Retail_Restriction_'+country_input,
+                                        'grocery_and_pharmacy_percent_change_from_baseline':'Grocery_Pharmacy_Restriction_'+country_input,
+                                        'parks_percent_change_from_baseline':'Park_Restriction_'+country_input}, axis=1)
     # German_data2 = German_data2.rename({'retail_and_recreation_percent_change_from_baseline':'Retail_Restriction_Germany',
-    #                                     'grocery_and_pharmacy_percent_change_from_baseline':'Grocery_Pharmacy_Restriction'})
+    #                                     'grocery_and_pharmacy_percent_change_from_baseline':'Grocery_Pharmacy_Restriction_Germany',
+    #                                     'parks_percent_change_from_baseline':'Park_Restriction_Germany'})
+    # Country_data2 = Country_data2.rename({'retail_and_recreation_percent_change_from_baseline':'Retail_Restriction_'+country_input,
+    #                                     'grocery_and_pharmacy_percent_change_from_baseline':'Grocery_Pharmacy_Restriction_'+country_input,
+    #                                     'parks_percent_change_from_baseline':'Park_Restriction_'+country_input})
+    # df_merge2 = pd.merge(German_data2, Country_data2, on='date')
     df_merge = pd.merge(German_data, Country_data, on='date')
+    # print(df_merge2['date'])
     new_df = pd.DataFrame(df_merge)
+    # new_df2 = pd.DataFrame(df_merge2)
     df_1 = pd.DataFrame(new_df)
+    # df_2 = pd.DataFrame(new_df2)
     if govt_rest == 'School closing':
         fig = px.line(df_1, x='date',
                       y=['SchoolClosing_Germany','SchoolClosing_' + country_input],
@@ -285,6 +297,52 @@ def build_graph1(country_input,govt_rest):
                       height=720, width=980, title='Comparing International travel restriction of ' + country_input + ' against Germany',
                       template='plotly_dark')
         return fig,fig1
+    elif govt_rest == 'Restriction on Retail':
+        fig = px.line(df_1, x='date',
+                      y=['Retail_Restriction_Germany', 'Retail_Restriction_' + country_input],
+                      height=720, width=980,
+                      title='Comparing Retail restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['Retail_Restriction_Germany',
+                         'Retail_Restriction_' + country_input],
+                      height=720, width=980,
+                      title='Comparing Retail restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+    elif govt_rest == "Restriction on pharmacy":
+        fig = px.line(df_1, x='date',
+                      y=['Grocery_Pharmacy_Restriction_Germany', 'Grocery_Pharmacy_Restriction_' + country_input],
+                      height=720, width=980,
+                      title='Comparing Retail restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['Grocery_Pharmacy_Restriction_Germany',
+                         'Grocery_Pharmacy_Restriction_' + country_input],
+                      height=720, width=980,
+                      title='Comparing Retail restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+    elif govt_rest == "Restriction on park":
+        fig = px.line(df_1, x='date',
+                      y=['Grocery_Pharmacy_Restriction_Germany', 'Grocery_Pharmacy_Restriction_' + country_input],
+                      height=720, width=980,
+                      title='Comparing Retail restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['Park_Restriction_Germany',
+                         'Park_Restriction_' + country_input],
+                      height=720, width=980,
+                      title='Comparing Retail restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+
+
+
+
 
 
 
