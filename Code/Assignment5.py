@@ -8,6 +8,7 @@ import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output, State
+import xlrd
 
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
@@ -47,7 +48,10 @@ df_europe_cases = df_europe_cases.reset_index()
 df_europe_cases['date'] = pd.to_datetime(df_europe_cases['date'])
 df_europe_cases['date'] = df_europe_cases['date'].dt.strftime('%B %d, %Y')
 # print(df_europe_cases)
-
+DataSet1 = pd.read_csv('Dataset1.csv')
+DataSet2 = pd.read_csv('Dataset2.csv')
+DataSet1['date'] = pd.to_datetime(DataSet1['date'])
+DataSet1['date'] = DataSet1['date'].dt.strftime('%B %d, %Y')
 df_recovered = pd.read_csv("time_series_covid19_recovered_global.csv")
 del df_recovered['Province/State']
 del df_recovered['Lat']
@@ -96,12 +100,25 @@ app.layout = html.Div([
         dcc.Dropdown(id='country',
                      options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
                               ['country'].unique()], value='Albania', clearable=True, searchable=True,
-                     placeholder='Choose Country...', style={'height': '40px', 'width': '1500px'},)
+                     placeholder='Choose Country...', style={'height': '40px', 'width': '1500px'},),
+        dcc.Dropdown(id='GovtRestriction',
+                               options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
+                               ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
+                               placeholder='Choose restriction...', style={'height': '40px', 'width': '1500px'}, )
     ], className='ten columns'),
     html.Div([
         dcc.Graph(id='line_graph'),
 
     ], className='four columns'),
+html.Div([dcc.Graph(id='bar_graph'),
+              html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
+
+              ], className='five columns'),
+html.Div([
+        dcc.Graph(id='line_graph1'),
+
+    ], className='four columns'),
+
     html.Div([
         dash_table.DataTable(
              id='data_table',
@@ -151,7 +168,8 @@ app.layout = html.Div([
 
 @app.callback(
     Output('line_graph', 'figure'),
-    [Input('country', 'value')])
+    [Input('country', 'value'),])
+
 def build_graph(country_input):
     df_per_country = df_merged[(df_merged['country'] == country_input)]
     df_per_country = df_per_country.rename({'total_cases': 'total_cases_'+country_input,
@@ -170,6 +188,104 @@ def build_graph(country_input):
                   template='plotly_dark')
     fig.update_layout(title=dict(font=dict(size=20)))
     return fig
+
+#Items from DataSet1 and DataSet2
+@app.callback(
+    [Output('line_graph1', 'figure'),
+     Output('bar_graph', 'figure')],
+    [Input('country', 'value'),Input("GovtRestriction","value")],
+      )
+
+def build_graph1(country_input,govt_rest):
+    German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
+    Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
+    # German_data2 = DataSet2[(DataSet2['country'] == "Germany")]
+    # Country_data2 = DataSet2[(DataSet2['country'] == country_input)]
+    German_data = German_data.rename({'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
+                                   'C6_Stay at home requirements': 'StayHomeRestriction_Germany', 'C4_Restrictions on gatherings': 'GatherRestriction_Germany',
+                                   'C5_Close public transport':'TransportRestriction_Germany','C8_International travel controls':'InternationalTravelRestriction_Germany'}, axis=1)
+    Country_data = Country_data.rename({'C1_School closing': 'SchoolClosing_'+country_input, 'C2_Workplace closing': 'WorkPlaceClosing_'+country_input,
+                                   'C6_Stay at home requirements': 'StayHomeRestriction_'+country_input, 'C4_Restrictions on gatherings': 'GatherRestriction_'+country_input,
+                                   'C5_Close public transport':'TransportRestriction_'+country_input,
+                                   'C8_International travel controls':'InternationalTravelRestriction_'+country_input}, axis=1)
+    # German_data2 = German_data2.rename({'retail_and_recreation_percent_change_from_baseline':'Retail_Restriction_Germany',
+    #                                     'grocery_and_pharmacy_percent_change_from_baseline':'Grocery_Pharmacy_Restriction'})
+    df_merge = pd.merge(German_data, Country_data, on='date')
+    new_df = pd.DataFrame(df_merge)
+    df_1 = pd.DataFrame(new_df)
+    if govt_rest == 'School closing':
+        fig = px.line(df_1, x='date',
+                      y=['SchoolClosing_Germany','SchoolClosing_' + country_input],
+                      height=720, width=980, title='Comparing school closure of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['SchoolClosing_Germany',
+                         'SchoolClosing_' + country_input],
+                      height=720, width=980, title='Comparing school closure of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig,fig1
+    elif govt_rest == 'Workplace closing' :
+        fig = px.line(df_1, x='date',
+                      y=['WorkPlaceClosing_Germany', 'WorkPlaceClosing_' + country_input],
+                      height=720, width=980, title='Comparing work place closure of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['WorkPlaceClosing_Germany',
+                         'WorkPlaceClosing_' + country_input],
+                      height=720, width=980, title='Comparing work place closure of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+    elif govt_rest == 'Stay at home requirements' :
+        fig = px.line(df_1, x='Date',
+                      y=['StayHomeRestriction_Germany', 'StayHomeRestriction_' + country_input],
+                      height=720, width=980, title='Comparing stay at home restrictions of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['StayHomeRestriction_Germany',
+                         'StayHomeRestriction_' + country_input],
+                      height=720, width=980, title='Comparing stay at home restrictions of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+    elif govt_rest == 'Restrictions on gatherings':
+        fig = px.line(df_1, x='date',
+                      y=['GatherRestriction_Germany', 'GatherRestriction_' + country_input],
+                      height=720, width=980, title='Comparing public gathering restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['GatherRestriction_Germany',
+                         'GatherRestriction_' + country_input],
+                      height=720, width=980, title='Comparing public gathering restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+    elif govt_rest == 'Close public transport':
+        fig = px.line(df_1, x='date',
+                      y=['TransportRestriction_Germany', 'TransportRestriction_' + country_input],
+                      height=720, width=980, title='Comparing Internal transport restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['TransportRestriction_Germany',
+                         'TransportRestriction_' + country_input],
+                      height=720, width=980, title='Comparing Internal transport restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig, fig1
+    elif govt_rest == 'International travel controls':
+        fig = px.line(df_1, x='date',
+                      y=['InternationalTravelRestriction_Germany', 'InternationalTravelRestriction_' + country_input],
+                      height=720, width=980, title='Comparing International travel restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+
+        fig1 = px.bar(df_1, x='date',
+                      y=['InternationalTravelRestriction_Germany',
+                         'InternationalTravelRestriction_' + country_input],
+                      height=720, width=980, title='Comparing International travel restriction of ' + country_input + ' against Germany',
+                      template='plotly_dark')
+        return fig,fig1
+
 
 
 @app.callback(
@@ -210,6 +326,8 @@ def update_datatable(country_input):
 def main():
     euro_government_measureDF = prepare_data_government_measures(
         govern_measures_data_file)
+
+
 
 if __name__ == '__main__':
     main()
