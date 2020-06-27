@@ -10,26 +10,42 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import xlrd
+from plotly.validators.layout import _plot_bgcolor
 
 
 ####### Initializing the data files and preparing sanitized dataframe ######
 
-## Data Files
-from plotly.validators.layout import _plot_bgcolor
-
+# Data Files
+# Source : https://www.acaps.org/covid19-government-measures-dataset
 govern_measures_data_file = "datasets/acaps_covid19_government_measures_dataset_0.xlsx"
+
 govern_restrictions_data_file = "datasets/Dataset1.csv"
+
+# Source : https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest.csv
 owid_covid_data_file = "datasets/owid-covid-data.csv"
+
 recoveries_data_file = "datasets/time_series_covid19_recovered_global.csv"
 
 # Reading data for covid statistics and recovery
-df_merged, df_europe_cases = dh.read_data_covid_and_recovery(owid_covid_data_file, recoveries_data_file)
+df_merged, df_merged_raw, df_europe_cases = dh.read_data_covid_and_recovery(
+    owid_covid_data_file, recoveries_data_file)
 
-## Reading the Data for government restrictions
+# Reading the Data for government restrictions
 DataSet1 = dh.read_data_government_restrictions(govern_restrictions_data_file)
 
-## Reading the Data for data table which displays government measures
-data_table_visulaization_df = dh.read_data_government_measures(govern_measures_data_file)
+# Reading the Data for data table which displays government measures
+data_table_visulaization_df = dh.read_data_government_measures(
+    govern_measures_data_file)
+
+# https://community.plotly.com/t/dash-range-slider-with-date/17915/7
+# Preparing the date objects for displaying in slider
+date_num_encoder = [x for x in range(len(df_merged['date'].unique()))]
+date_increamentor = 10
+number_date_array = list(
+    zip(date_num_encoder, pd.to_datetime(df_merged['date']).dt.date.unique()))
+number_date_range = number_date_array[0::date_increamentor]
+
+number_date_range_dict = dict(number_date_range)
 
 #############################################################################
 
@@ -66,12 +82,25 @@ app.layout = html.Div([
                      placeholder='Choose Cases...', style={'height': '30px', 'width': '200px'})
     ], className='two columns'),
     html.Div([
+        html.Label(['Choose Date:'], style={
+             'font-weight': 'bold', "text-align": "left"}),
+        dcc.RangeSlider(id = 'slider_date',
+                        min=date_num_encoder[0],  # the first date
+                        max=date_num_encoder[-1],  # the last date
+                        value=[date_num_encoder[0],date_num_encoder[0]],
+                        step=date_increamentor,
+                        marks={number: date.strftime('%Y-%m-%d') for number, date in number_date_range}
+                        )
+    ], className='ten columns'),
+
+    html.Div([
         html.Label(['Choose country:'], style={
              'font-weight': 'bold', "text-align": "left"}),
         dcc.Dropdown(id='country',
                      options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
                               ['country'].unique()], value='Albania', clearable=True, searchable=True,
                      placeholder='Choose Country...', style={'height': '40px', 'width': '1500px'},),
+
         dcc.Dropdown(id='GovtRestriction',
                                options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
                                ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
@@ -79,7 +108,6 @@ app.layout = html.Div([
     ], className='ten columns'),
     html.Div([
         dcc.Graph(id='line_graph'),
-
     ], className='four columns'),
 html.Div([
         dcc.Graph(id='bar_graph_cases'),
@@ -141,26 +169,30 @@ html.Div([
              tooltip_duration=None,
              )
     ], className='eleven columns')
-    ])
+])
 # ----------------
 
 
 @app.callback(
     Output('line_graph', 'figure'),
+    [Input('country', 'value'),
+    Input('slider_date', 'value') ])
+def build_graph(country_input,input_date_range):
 
-    [Input('country', 'value'),])
+    # Filtering the results based on input date range
+    df_merged_filtered = dh.handle_updated_dates(df_merged, 'date' , input_date_range, number_date_range_dict)
 
-def build_graph(country_input):
-    df_per_country = df_merged[(df_merged['country'] == country_input)]
+    df_per_country = df_merged_filtered[(df_merged_filtered['country'] == country_input)]
     df_per_country = df_per_country.rename({'total_cases': 'total_cases_'+country_input,
                                             'total_deaths': 'total_deaths_'+country_input,
                                             'total_recovery': 'total_recovery_'+country_input}, axis=1)
-    df_germany = df_merged[(df_merged['country'] == "Germany")]
+    df_germany = df_merged_filtered[(df_merged_filtered['country'] == "Germany")]
     df_germany = df_germany.rename({'total_cases': 'total_cases_Germany', 'total_deaths': 'total_deaths_Germany',
                                     'total_recovery': 'total_recovery_Germany'},  axis=1)
     df_merge = pd.merge(df_germany, df_per_country, on='date')
     # print(df_merge.to_string())
     df_merge = pd.DataFrame(df_merge)
+
     fig = px.line(df_merge, x='date', y=["total_cases_Germany", "total_deaths_Germany", "total_recovery_Germany",
                                          "total_cases_"+country_input, "total_deaths_"+country_input,
                                          "total_recovery_"+country_input],
@@ -172,27 +204,31 @@ def build_graph(country_input):
 @app.callback(
     [Output('bar_graph_cases', 'figure'),
      Output('bar_graph_deaths', 'figure')],
-    [Input('country', 'value'), ])
+    [Input('country', 'value'),
+    Input('slider_date', 'value') ])
 
-def build_bargraph(country_input):
-    df_per_country1 = df_merged[(df_merged['country'] == country_input)]
+def build_bargraph(country_input, input_date_range):
+
+    # Filtering the results based on input date range
+    df_merged_filtered = dh.handle_updated_dates(df_merged, 'date' , input_date_range, number_date_range_dict)
+
+    df_per_country1 = df_merged_filtered[(df_merged_filtered['country'] == country_input)]
     df_per_country1 = df_per_country1.rename({'new_cases':'new_cases_'+country_input,'new_deaths':'new_deaths_'+country_input}, axis=1)
-    df_germany1 = df_merged[(df_merged['country'] == "Germany")]
+    df_germany1 = df_merged_filtered[(df_merged_filtered['country'] == "Germany")]
     df_germany1 = df_germany1.rename({'new_cases':'new_cases_Germany','new_deaths':'new_deaths_Germany'},  axis=1)
     df_merge1 = pd.merge(df_germany1, df_per_country1, on='date')
-    # print(df_merge.to_string())
+    #print(df_merge1)
+
     df_merge1 = pd.DataFrame(df_merge1)
     # fig = px.line(df_merge1, x='date', y=['new_cases_Germany','new_deaths_Germany','new_cases_'+country_input,'new_deaths_'+country_input],
     #               height=720, width=980, title='Comparing COVID cases of '+country_input+' against Germany',
     #               template='plotly_dark')
     print(df_merge1.info())
+
     fig = go.Figure(data=[
-        go.Bar(name='new_cases_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
+        go.Bar(name='new_cases_of_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
         go.Bar(name='new_cases_'+country_input, x=df_merge1['date'], y=df_merge1['new_cases_'+country_input])
-
-
     ])
-
     fig1 = go.Figure(data=[
         go.Bar(name='new_deaths_Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='new_deaths_' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
@@ -287,13 +323,12 @@ def drawLinegraph(Dframe,x,country):
                   title='Comparing' + x +'of ' + country + ' against Germany')
     return fig
 
+
 @app.callback(
     Output('bar_graph_mean', 'figure')
      ,
     [Input('country', 'value'),Input("GovtRestriction","value")],
       )
-
-
 def build_graph_mean(country_input,govt_rest):
     German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
     Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
@@ -328,7 +363,7 @@ def build_graph_mean(country_input,govt_rest):
     df_merge_mean['meanGermany'] = df_merge_mean['meanGermany'].fillna(0)
     df_merge_mean['meanCountry'] = df_merge_mean['meanCountry'].fillna(0)
 
-    print(df_merge_mean['meanGermany'])
+    #print(df_merge_mean['meanGermany'])
 
 
     new_df_mean = pd.DataFrame(df_merge_mean)
@@ -341,8 +376,12 @@ def build_graph_mean(country_input,govt_rest):
 
 @app.callback(
     Output(component_id='the_graph', component_property='figure'),
-    [Input('cases', 'value')])
-def build_map(case):
+    [Input('cases', 'value'),
+     Input('slider_date', 'value')])
+def build_map(case, input_date_range):
+    
+    df_merged_date_filtered = dh.handle_updated_dates(df_merged_raw, 'date' , input_date_range, number_date_range_dict)
+
     if case == 'R':
         case_chosen = 'total_recovery'
     elif case == 'D':
@@ -350,7 +389,7 @@ def build_map(case):
     else:
         case_chosen = 'total_cases'
 
-    fig_map = px.choropleth(data_frame=df_merged, geojson=europe_geo_json, locations='country',
+    fig_map = px.choropleth(data_frame=df_merged_date_filtered, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
                             projection="miller", color_continuous_scale='reds',
                             title='Total COVID-19 Cases Across Europe', width=1500, height=720)  # , template='plotly_dark')
@@ -361,11 +400,13 @@ def build_map(case):
 
 @app.callback(
     [Output('data_table', 'data'),
-    Output('data_table', 'tooltip_data')],
-    [Input('country', 'value')])
-def update_datatable(country_input):
-    data_per_country_df = data_table_visulaization_df[(
-        data_table_visulaization_df['COUNTRY'] == country_input)]
+     Output('data_table', 'tooltip_data')],
+    [Input('country', 'value'),
+     Input('slider_date', 'value')])
+def update_datatable(country_input, input_date_range):
+    data_per_country_df = data_table_visulaization_df[(data_table_visulaization_df['COUNTRY'] == country_input)]
+    
+    data_per_country_df = dh.handle_updated_dates(data_per_country_df, 'DATE_IMPLEMENTED' , input_date_range, number_date_range_dict)
     tooltip_data = [
         {
             column: {'value': str(value), 'type': 'markdown'}
@@ -373,6 +414,7 @@ def update_datatable(country_input):
         } for row in data_per_country_df.to_dict('rows')
     ]
     return (data_per_country_df.to_dict('records'), tooltip_data)
+
 
 def main():
     euro_government_measureDF = dh.read_data_government_measures(
@@ -382,3 +424,4 @@ def main():
 if __name__ == '__main__':
     main()
     app.run_server(debug=True)
+

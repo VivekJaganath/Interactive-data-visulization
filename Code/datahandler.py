@@ -37,7 +37,7 @@ def read_data_covid_and_recovery(owid_covid_data_file, filename2):
     df_europe = df_world[search_df_europe]
     df_europe = df_europe.rename({'location': 'country'}, axis=1)
     df_europe_cases = df_europe.groupby(['date', 'country'])[
-        'total_cases', 'total_deaths'].max()
+        'total_cases', 'total_deaths', 'new_cases', 'new_deaths'].max()
     df_europe_cases = df_europe_cases.reset_index()
 
     # Normalizing the date and countries
@@ -61,9 +61,10 @@ def read_data_covid_and_recovery(owid_covid_data_file, filename2):
     df_recovered_normalized = country_normalizer(df_recovered, 'country')
 
     # Merging the both the above dataframe on "country" and "date" columns
+    df_merged_raw = pd.merge(df_europe_cases, df_recovered, on=['country', 'date'])
     df_merged = pd.merge(df_europe_cases_normalized, df_recovered_normalized, on=['country', 'date'])
 
-    return (df_merged, df_europe_cases_normalized)
+    return (df_merged, df_merged_raw, df_europe_cases_normalized)
 
 
 def date_formatter(input_dataframe, column_name):
@@ -74,3 +75,31 @@ def date_formatter(input_dataframe, column_name):
 def country_normalizer(input_dataframe, column_name):
     normalized_country_df = input_dataframe[input_dataframe[column_name].isin(distinct_europe_countries_list)]
     return(normalized_country_df)
+
+
+def handle_updated_dates(input_dataframe, column_name, slider_input_date_list, number_date_range_dict ):
+
+    start_index = slider_input_date_list[0]
+    end_index = slider_input_date_list[-1]
+
+    if (start_index == 0) & (end_index == 0):
+        end_index = max(number_date_range_dict, key=number_date_range_dict.get)
+
+    # Fetch the start and end dates from the number_date_range_dict
+    start_date = pd.Timestamp(number_date_range_dict.get(start_index))
+    end_date = pd.Timestamp(number_date_range_dict.get(end_index))
+    
+    # Encode the Date timestamp   
+    input_dataframe[column_name] = pd.to_datetime(input_dataframe[column_name])
+                                #.loc[,column_name]
+
+    # Filter the records between Start and End Dates
+    # Ref : https://kite.com/python/answers/how-to-filter-pandas-dataframe-rows-by-date-in-python
+    from_start_date = input_dataframe[column_name] >= start_date
+    until_end_date = input_dataframe[column_name] <= end_date
+    between_start_and_end_dates = from_start_date & until_end_date
+
+    # Filtering the dataframe records
+    date_filtered_records = input_dataframe.loc[between_start_and_end_dates]
+
+    return (date_filtered_records)
