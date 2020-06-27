@@ -1,6 +1,6 @@
 import pandas as pd
 import plotly.express as px
-
+import datahandler as dh
 import json
 import dash
 import dash_table
@@ -10,67 +10,35 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import xlrd
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
+####### Initializing the data files and preparing sanitized dataframe ######
+
+## Data Files
 govern_measures_data_file = "datasets/acaps_covid19_government_measures_dataset_0.xlsx"
+govern_restrictions_data_file = "datasets/Dataset1.csv"
+owid_covid_data_file = "datasets/owid-covid-data.csv"
+recoveries_data_file = "datasets/time_series_covid19_recovered_global.csv"
+
+# Reading data for covid statistics and recovery
+df_merged, df_europe_cases = dh.read_data_covid_and_recovery(owid_covid_data_file, recoveries_data_file)
+
+## Reading the Data for government restrictions
+DataSet1 = dh.read_data_government_restrictions(govern_restrictions_data_file)
+
+## Reading the Data for data table which displays government measures
+data_table_visulaization_df = dh.read_data_government_measures(govern_measures_data_file)
+
+#############################################################################
+
+# Intializing the json file which will be used for Geo visualization
+with open('europe_geo.json') as json_file:
+    europe_geo_json = json.load(json_file)
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 #app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 app.title = "IDV Mini-Project-COVID"
-
-
-def prepare_data_government_measures(filename):
-
-    gm_df = pd.read_excel(filename, sheet_name="Database")
-    european_gn_df = gm_df[gm_df['REGION'] == "Europe"]
-    filtered_european_gn_df = european_gn_df.filter(
-        ["COUNTRY", "ISO", "REGION", "CATEGORY", "MEASURE", "COMMENTS", "DATE_IMPLEMENTED", "LINK",  "SOURCE", "SOURCE_TYPE"])
-    # data_table_visualization = european_gn_df.filter(["COUNTRY", "ISO", "REGION", "CATEGORY", "MEASURE", "COMMENTS", "DATE_IMPLEMENTED", "LINK",  "SOURCE", "SOURCE_TYPE"]
-    # print(filtered_european_gn_df.shape)
-    # print(filtered_european_gn_df.head())
-    # print(filtered_european_gn_df.dtypes)
-
-    return (filtered_european_gn_df)
-
-#json_file = "europe_geo.json"
-
-
-with open('europe_geo.json') as json_file:
-    europe_geo_json = json.load(json_file)
-
-df_world = pd.read_csv("owid-covid-data.csv")
-search_df_europe = df_world['continent'] == 'Europe'
-df_europe = df_world[search_df_europe]
-df_europe = df_europe.rename({'location': 'country'}, axis=1)
-df_europe_cases = df_europe.groupby(['date', 'country'])[
-    'total_cases', 'total_deaths'].max()
-df_europe_cases = df_europe_cases.reset_index()
-df_europe_cases['date'] = pd.to_datetime(df_europe_cases['date'])
-df_europe_cases['date'] = df_europe_cases['date'].dt.strftime('%B %d, %Y')
-# print(df_europe_cases)
-DataSet1 = pd.read_csv('Dataset1.csv')
-DataSet2 = pd.read_csv('Dataset2.csv')
-DataSet1['date'] = pd.to_datetime(DataSet1['date'])
-DataSet1['date'] = DataSet1['date'].dt.strftime('%B %d, %Y')
-df_recovered = pd.read_csv("time_series_covid19_recovered_global.csv")
-del df_recovered['Province/State']
-del df_recovered['Lat']
-del df_recovered['Long']
-df_recovered = df_recovered.rename({'Country/Region': 'country'}, axis=1)
-df_recovered = df_recovered.groupby(['country']).sum()
-df_recovered = df_recovered.reset_index()
-df_recovered = pd.melt(df_recovered, id_vars=[
-                       "country"], var_name="date", value_name="total_recovery")
-df_recovered['total_recovery'] = df_recovered['total_recovery'].astype(float)
-df_recovered['date'] = pd.to_datetime(df_recovered['date'])
-df_recovered['date'] = df_recovered['date'].dt.strftime('%B %d, %Y')
-
-df_merged = pd.merge(df_europe_cases, df_recovered, on=['country', 'date'])
-
-euro_government_measureDF = prepare_data_government_measures(
-    govern_measures_data_file)
-data_table_visulaization_df = euro_government_measureDF.filter(
-    ["COUNTRY", "CATEGORY", "MEASURE", "DATE_IMPLEMENTED", "COMMENTS"])
 
 colors = {
     'background': '#F0FFFF',
@@ -382,9 +350,8 @@ def update_datatable(country_input):
     return (data_per_country_df.to_dict('records'), tooltip_data)
 
 def main():
-    euro_government_measureDF = prepare_data_government_measures(
+    euro_government_measureDF = dh.read_data_government_measures(
         govern_measures_data_file)
-
 
 
 if __name__ == '__main__':
