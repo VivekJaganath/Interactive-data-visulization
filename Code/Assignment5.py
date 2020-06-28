@@ -110,7 +110,7 @@ app.layout = html.Div([
               'display' : 'inline-block'}),
     html.Div([
         html.Label(['Choose cases:'], style={'float':'left',
-            'background-color':'white',
+            'background-color':'white', 'margin-top':'10px',
             'font-weight': 'bold','font-size':'15px'}),
         dcc.RadioItems(id='cases',
                      options=[{'label': 'Confirmed', 'value': 'C'}, {'label': 'Death', 'value': 'D'},
@@ -123,11 +123,11 @@ app.layout = html.Div([
                      }),
         dcc.Textarea(
         id='textarea-example',
-        value='Description of the Graph should be here',
+        value='This map helps to visualize statistical data through shading patterns and it represents data concerning Confirmed cases, Deaths and Recovery rates, across European nations. The shading patterns (intensity of color) represents the occurence intensity of corresponding cases.',
         readOnly='readOnly',
         draggable='false',
         disabled='true',
-        style={'background-color':'white','float':'left','border-color':'white', 'height':'250px', 'width':'100px'
+        style={'background-color':'white','float':'left','border-color':'white', 'height':'250px', 'width':'250px'
         },
     )
     ], className='two columns', style={'height':'400px','float':'left','display' : 'inline-block',
