@@ -195,15 +195,7 @@ app.layout = html.Div([
             ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%',
             'height':'70px', 'width':'92%',
                 'max-width':'92%'}),
-            dcc.RadioItems(id='graphType',
-                     options=[{'label': 'Bar Graph', 'value': 'B'},
-                              {'label': 'Line Graph', 'value': 'L'}],
-                     value='L', labelStyle={'display': 'inline-block'},
-                     style={'float':'left', 'margin-left':'550px',
-                     'background-color':'white',
-                     'height': '30px',
-                     'width':'500px'
-                     }),
+            
     html.Hr(style={'margin-top':'20px','margin-left':'4%','float':'left',
     'border-top':'3px solid #bbb',
     'width':'92%',
@@ -270,6 +262,17 @@ app.layout = html.Div([
         style={'float':'left','background-color':'white','height':'400px', 'width':'50%',
               'margin-bottom':'2%'}),
     ###############
+    html.Hr(style={'float':'left','margin-top':'30px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
+    dcc.RadioItems(id='graphType',
+                     options=[{'label': 'Bar Graph', 'value': 'B'},
+                              {'label': 'Line Graph', 'value': 'L'}],
+                     value='L', labelStyle={'display': 'inline-block'},
+                     style={'float':'left', 'margin-left':'550px',
+                     'background-color':'white',
+                     'height': '30px',
+                     'width':'500px'
+                     }),
+    ###############
     html.Div([
         dcc.Graph(id='bar_graph_deaths'),
     ],
@@ -280,9 +283,8 @@ app.layout = html.Div([
               ],
         style={'float':'left','background-color':'white','height':'300px', 'width':'50%',
               'margin-bottom':'2%'})
-    ###############
     ],
-    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1100px',
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1200px',
     'margin-left':'5%','margin-right':'5%','width':'90%',
                 'max-width':'90%'}),          
     ##Comparison Graphs##
