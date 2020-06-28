@@ -36,15 +36,9 @@ DataSet1 = dh.read_data_government_restrictions(govern_restrictions_data_file)
 data_table_visulaization_df = dh.read_data_government_measures(
     govern_measures_data_file)
 
-# https://community.plotly.com/t/dash-range-slider-with-date/17915/7
 # Preparing the date objects for displaying in slider
-date_num_encoder = [x for x in range(len(df_merged['date'].unique()))]
 date_increamentor = 10
-number_date_array = list(
-    zip(date_num_encoder, pd.to_datetime(df_merged['date']).dt.date.unique()))
-number_date_range = number_date_array[0::date_increamentor]
-
-number_date_range_dict = dict(number_date_range)
+date_num_encoder, number_date_range_dict, slider_marks_dict  = dh.generate_slider_data(df_merged, 'date', date_increamentor)
 
 #############################################################################
 
@@ -86,12 +80,12 @@ app.layout = html.Div([
         html.Div([
             html.Label(['Choose Date:'], style={
             'font-weight': 'bold', "text-align": "left"}),
-        dcc.RangeSlider(id='slider_date',
+            dcc.RangeSlider(id='slider_date',
                         min=date_num_encoder[0],  # the first date
-                        max=date_num_encoder[-1],  # the last date
-                        value=[date_num_encoder[0], date_num_encoder[0]],
-                        step=date_increamentor,
-                        marks={number: date.strftime('%Y-%m-%d') for number, date in number_date_range}, 
+                        max=date_num_encoder[-4],  # the last date
+                        value=[date_num_encoder[0],date_num_encoder[-4]],
+                        #step=date_increamentor,
+                        marks=slider_marks_dict
                         )
         ], style={'float':'left','background-color':'white','width':'92%',
     'max-width':'92%','height':'60px',
@@ -312,56 +306,101 @@ app.layout = html.Div([
             ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
             'height':'80px'}),
     html.Hr(style={'margin-top':'10px','margin-left':'4%','float':'left','width':'92%','border-top':'3px solid #bbb'}),
+    html.Div([
+        dcc.Tabs(id='data_table_tab', value='tab-1', children=[
+            dcc.Tab(id='tab-1', value='tab-1', children=[
+            dash_table.DataTable(
+                id='other_countries_data_table',
+                columns=[{"name": i, "id": i}
+                        for i in data_table_visulaization_df.columns],
+                # data=data_table_visulaization_df.to_dict('records'),
+                page_size=10,  # we have less data in this example, so setting to 20
+                # style_table={'height': '300px', 'overflowY': 'auto'},
+                style_header={
+                    'backgroundColor': 'rgb(78, 149, 230)',
+                    'fontWeight': 'bold',
+                    'color': '#FFFFFF',
+                    'border': '1px solid black'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(206, 220, 245)'
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
+                },
 
+                style_cell={
+                    'minWidth': '30px', 'width': '50px', 'maxWidth': '240px',
+                    'textAlign': 'left',
+                    'whiteSpace': 'normal',
+                    'height': 'auto'
+                },
+                fixed_rows={'headers': True},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                tooltip_duration=None,
+            )
+            ]),
+            dcc.Tab(id='tab-2', value='tab-2', children=[
+            dash_table.DataTable(
+                id='germany_data_table',
+                columns=[{"name": i, "id": i}
+                        for i in data_table_visulaization_df.columns],
+                # data=data_table_visulaization_df.to_dict('records'),
+                page_size=10,  # we have less data in this example, so setting to 20
+                # style_table={'height': '300px', 'overflowY': 'auto'},
+                style_header={
+                    'backgroundColor': 'rgb(89, 168, 77)',
+                    'fontWeight': 'bold',
+                    'color': '#FFFFFF',
+                    'border': '1px solid black'
+                },
+                style_data_conditional=[
+                    {
+                        'if': {'row_index': 'odd'},
+                        'backgroundColor': 'rgb(203, 237, 189)'
+                    }
+                ],
+                style_data={
+                    'whiteSpace': 'normal',
+                    'height': 'auto',
+                    'lineHeight': '15px'
+                },
 
-    dash_table.DataTable(
-             id='data_table',
-             columns=[{"name": i, "id": i}
-                      for i in data_table_visulaization_df.columns],
-             # data=data_table_visulaization_df.to_dict('records'),
-             page_size=10,  # we have less data in this example, so setting to 20
-             #style_table={'height': '300px', 'overflowY': 'auto'},
-             style_header={
-                 'backgroundColor': 'rgb(230, 230, 230)',
-                 'fontWeight': 'bold'
-             },
-             style_data_conditional=[
-                 {
-                     'if': {'row_index': 'odd'},
-                     'backgroundColor': 'rgb(248, 248, 248)'
-                 }
-             ],
-             style_data={
-                 'whiteSpace': 'normal',
-                 'height': 'auto',
-                 'lineHeight': '15px'
-             },
+                style_cell={
+                    'minWidth': '30px', 'width': '50px', 'maxWidth': '240px',
+                    'textAlign': 'left',
+                    'whiteSpace': 'normal',
+                    'height': 'auto'
+                },
+                fixed_rows={'headers': True},
+                css=[{
+                    'selector': '.dash-spreadsheet td div',
+                    'rule': '''
+                        line-height: 15px;
+                        max-height: 30px; min-height: 30px; height: 30px;
+                        display: block;
+                        overflow-y: hidden;
+                    '''
+                }],
+                tooltip_duration=None,
+            )
+            ])            
+        ])
 
-             style_cell={
-                 'minWidth': '30px', 'width': '50px', 'maxWidth': '240px',
-                 'textAlign': 'left',
-                 'whiteSpace': 'normal',
-                 'height': 'auto'
-             },
-             style_table={
-                 'float':'left',
-                 'margin-left':'5%',
-                 'width': '90%',
-                'minWidth': '90%'
-             },
-             fixed_rows={'headers': True},
-             css=[{
-                 'selector': '.dash-spreadsheet td div',
-                 'rule': '''
-                    line-height: 15px;
-                    ,
-                    max-height: 30px; min-height: 30px; height: 30px;
-                    display: inline-block;
-                    overflow-y: hidden;
-                '''
-             }],
-             tooltip_duration=None,
-             )
+    ],style={'height':'500px','margin-left':'4%','float':'left','width':'92%','max-width':'92%','background-color':'white'}),     
     ], className='eleven columns', style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'650px',
     'margin-left':'5%','margin-right':'5%','width':'90%',
     'max-width':'90%'}),  
@@ -439,7 +478,7 @@ def build_bargraph(country_input, input_date_range):
 
     df_merge1 = pd.DataFrame(df_merge1)
 
-    print(df_merge1.info())
+    #print(df_merge1.info())
 
     fig = go.Figure(data=[
         go.Bar(name='New cases in Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
@@ -611,11 +650,16 @@ def build_map(case, input_date_range):
 
 
 @app.callback(
-    [Output('data_table', 'data'),
-     Output('data_table', 'tooltip_data')],
+    [Output('other_countries_data_table', 'data'),
+     Output('other_countries_data_table', 'tooltip_data'),
+     Output('tab-1', 'label')],
     [Input('country', 'value'),
-     Input('slider_date', 'value')])
-def update_datatable(country_input, input_date_range):
+     Input('slider_date', 'value'),
+     Input('data_table_tab', 'value')])
+def generate_datatable_countries(country_input, input_date_range, tab_id):
+
+    label = country_input
+
     data_per_country_df = data_table_visulaization_df[(data_table_visulaization_df['COUNTRY'] == country_input)]
 
     data_per_country_df = dh.handle_updated_dates(data_per_country_df, 'DATE_IMPLEMENTED', input_date_range,
@@ -626,14 +670,35 @@ def update_datatable(country_input, input_date_range):
             for column, value in row.items()
         } for row in data_per_country_df.to_dict('rows')
     ]
-    return (data_per_country_df.to_dict('records'), tooltip_data)
+    return (data_per_country_df.to_dict('records'), tooltip_data, label)
 
+@app.callback(
+    [Output('germany_data_table', 'data'),
+     Output('germany_data_table', 'tooltip_data'),
+     Output('tab-2', 'label')],
+    [Input('slider_date', 'value'),
+     Input('data_table_tab', 'value')])
+def generate_datatable_germany(input_date_range, tab_id):
+    
+    country_input = "Germany"
+    label = country_input
 
-def main():
-    euro_government_measureDF = dh.read_data_government_measures(
-        govern_measures_data_file)
+    data_table_germany = data_table_visulaization_df[(data_table_visulaization_df['COUNTRY'] == country_input)]
+    tooltip_data = []
+
+    # Displaying only Germany data in Tab2 
+    if tab_id == 'tab-2':
+    
+        data_table_germany = dh.handle_updated_dates(data_table_germany, 'DATE_IMPLEMENTED', input_date_range,
+                                                    number_date_range_dict)
+        tooltip_data = [
+            {
+                column: {'value': str(value), 'type': 'markdown'}
+                for column, value in row.items()
+            } for row in data_table_germany.to_dict('rows')
+        ]
+    return (data_table_germany.to_dict('records'), tooltip_data, label)
 
 
 if __name__ == '__main__':
-    main()
     app.run_server(debug=True)
