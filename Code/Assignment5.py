@@ -68,14 +68,15 @@ colors = {
 app.layout = html.Div([
     html.H1("IDV Mini-Project COVID-19",
             style={
-                'background-color': colors['black'],
+                'background': 'linear-gradient(#bccef7, 5%, #3e71bd, 90%, #bccef7)',
                 'textAlign': 'center',
                 'color': colors['white'],
-                'height':'70px',
+                'height':'75px',
                 'width':'100%',
                 'max-width': '100%',
                 'font-size':'50px',
-                'font-family':'Comic Sans MS',
+                'font-weight':'bold',
+                'font-family':'Courier New',
                 'margin-bottom':'20px'
     }),
 
@@ -147,24 +148,32 @@ app.layout = html.Div([
 
     #########Selection of country###########
     html.Div([
-        html.H6("Select the country to generate trends in comparison with Germany",style={'float':'left','margin-top':'10px','margin-bottom':'10px',
-                     'margin-left':'2%','height': '30px'}),
+        html.H6("Select the country to generate trends in comparison with Germany",style={'float':'left',
+        'margin-top':'10px','margin-bottom':'10px',
+        'width':'92%', 'text-align':'center',
+        'color':'#ffffff',
+        'font-size':'30px',
+        'font-weight':'bold',
+        'max-width':'92%', 'font-family':'Comic Sans MS',
+        'margin-left':'4%','height': '30px'}),
         
         dcc.Dropdown(id='country',
                      options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
                               ['country'].unique()], value='Albania', clearable=True, searchable=True,
                      placeholder='Choose Country...', style={'float':'left',
                      'height': '30px',
-                     'margin-top':'4px','width':'50%',
-                     'margin-left':'2%'})
-    ],style={'float':'left','display':'inline-block','background-color':'white', 'width':'92%',
-    'max-width':'92%','height':'50px', 'margin-left':'4%','margin-right':'4%',
+                     'width':'52%',
+                     'max-width':'92%',
+                     'margin-top':'4px',
+                     'margin-left':'24%'})
+    ],style={'float':'left','display':'inline-block','background-color':'#3e71bd', 'width':'92%',
+    'max-width':'92%','height':'120px', 'margin-left':'4%','margin-right':'4%',
     'box-shadow':'5px 5px 5px #888888'}),
 
     #########Selection of country###########
 
     ##Space Div##    
-    html.Div(className='twelve columns', style={'height':'30px'}),
+    html.Div(className='twelve columns', style={'height':'1px'}),
 
     ##Trend Graphs##
     html.Div(
@@ -208,11 +217,11 @@ app.layout = html.Div([
               'margin-bottom':'2%'}),
     ],
     style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'650px',
-    'margin-left':'4%','margin-right':'4%','width':'92%','max-width':'92%'}),          
+    'margin-left':'5%','margin-right':'5%','width':'90%','max-width':'90%'}),          
     ##Trend Graphs##
 
     html.Div(className='twelve columns', style={'float':'left','width':'92%',
-                'max-width':'92%','height':'30px'}),
+                'max-width':'92%','height':'10px'}),
     
     ##Comparison Graphs##
     html.Div(
@@ -233,16 +242,19 @@ app.layout = html.Div([
                 }),
         #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
         
-        html.H6("Select the Policy Measure",style={'float':'right','margin-top':'10px','margin-bottom':'10px',
-                     'margin-right':'10%','height': '30px', 'width': '40%','text-align':'center'}),
+        html.H6("Select the Policy Measure : ",style={'float':'left','margin-top':'15px','margin-bottom':'10px',
+                    'margin-left':'10%',
+                    'height': '30px', 'width': '40%','text-align':'right'}),
         dcc.Dropdown(id='GovtRestriction',
                                options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
                                ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
-                               placeholder='Choose restriction...', style={'float':'right',
-                               'height': '40px', 'width': '40%','margin-right':'10%'})
+                               placeholder='Choose restriction...', style={'float':'left',
+                               'margin-top':'10px','margin-bottom':'10px',
+                               'margin-left':'1%',
+                               'height': '40px', 'width': '40%'})
             ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
             'height':'150px'}),
-    html.Hr(style={'float':'left','margin-top':'10px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
+    html.Hr(style={'float':'left','margin-top':'5px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
     html.Div([
         dcc.Graph(id='line_graph1'),
     ],
@@ -267,13 +279,11 @@ app.layout = html.Div([
     ###############
     ],
     style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1100px',
-    'margin-left':'4%','margin-right':'4%','width':'92%',
-                'max-width':'92%'}),          
+    'margin-left':'5%','margin-right':'5%','width':'90%',
+                'max-width':'90%'}),          
     ##Comparison Graphs##
-
+    html.Div(className='twelve columns', style={'height':'10px'}),
     ##Milestone Comparison##
-    html.Div(className='twelve columns', style={'height':'30px'}),
-
      html.Div([
         html.Div([
         html.H1("",style={'textAlign': 'center',
@@ -344,8 +354,8 @@ app.layout = html.Div([
              tooltip_duration=None,
              )
     ], className='eleven columns', style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'650px',
-    'margin-left':'4%','margin-right':'4%','width':'92%',
-    'max-width':'92%'}),  
+    'margin-left':'5%','margin-right':'5%','width':'90%',
+    'max-width':'90%'}),  
 
     html.Div(className='twelve columns', style={'height':'100px'})
 
