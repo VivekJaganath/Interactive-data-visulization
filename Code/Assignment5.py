@@ -107,7 +107,7 @@ app.layout = html.Div([
     html.Div(className='twelve columns', style={'height':'50px'}),
 
     html.Div([
-        html.Div([dcc.Graph(id='the_graph',style={'height':'600px'}),
+        html.Div([dcc.Graph(id='the_graph',style={'height':'520px'}),
               ], className='twelve columns', style={'float':'left',
               'max-width':'68%',
               'height':'400px',
@@ -365,7 +365,8 @@ app.layout = html.Div([
 
 
 @app.callback(
-    Output('line_graph', 'figure'),
+    [Output('line_graph', 'figure'),
+     Output('bar_graph', 'figure')],
     [Input('country', 'value'),
      Input('slider_date', 'value')])
 def build_graph(country_input, input_date_range):
@@ -375,10 +376,13 @@ def build_graph(country_input, input_date_range):
     df_per_country = df_merged_filtered[(df_merged_filtered['country'] == country_input)]
     df_per_country = df_per_country.rename({'total_cases': 'total_cases_' + country_input,
                                             'total_deaths': 'total_deaths_' + country_input,
-                                            'total_recovery': 'total_recovery_' + country_input}, axis=1)
+                                            'total_recovery': 'total_recovery_' + country_input,
+                                            'total_tests': 'total_tests_' + country_input}, axis=1)
     df_germany = df_merged_filtered[(df_merged_filtered['country'] == "Germany")]
-    df_germany = df_germany.rename({'total_cases': 'total_cases_Germany', 'total_deaths': 'total_deaths_Germany',
-                                    'total_recovery': 'total_recovery_Germany'}, axis=1)
+    df_germany = df_germany.rename({'total_cases': 'total_cases_Germany',
+                                    'total_deaths': 'total_deaths_Germany',
+                                    'total_recovery': 'total_recovery_Germany',
+                                    'total_tests': 'total_tests_Germany'}, axis=1)
     df_merge = pd.merge(df_germany, df_per_country, on='date')
     # print(df_merge.to_string())
     df_merge = pd.DataFrame(df_merge)
@@ -386,11 +390,18 @@ def build_graph(country_input, input_date_range):
     fig = px.line(df_merge, x='date', y=["total_cases_Germany", "total_deaths_Germany", "total_recovery_Germany",
                                          "total_cases_" + country_input, "total_deaths_" + country_input,
                                          "total_recovery_" + country_input],
-                  #height=720, width=980,
-                   title='Comparing COVID cases of ' + country_input + ' against Germany')
-    fig.update_layout(title=dict(font=dict(size=20)))
-    return fig
+                  title='Comparing COVID cases of ' + country_input + ' against Germany', template='seaborn')
 
+    fig.update_layout(title=dict(font=dict(size=20)))
+    fig_bar_graph = go.Figure(data=[
+        go.Bar(name='Total tests in Germany', x=df_merge['date'], y=df_merge['total_tests_Germany'],
+               marker_color='crimson'),
+        go.Bar(name='Total tests in ' + country_input, x=df_merge['date'], y=df_merge['total_tests_' + country_input],
+               marker_color='rgb(26, 118, 255)')
+    ])
+    fig_bar_graph.update_layout(title_text='Comparing COVID tests of ' + country_input + ' against Germany',
+                                title=dict(font=dict(size=20)))
+    return fig, fig_bar_graph
 
 @app.callback(
     [Output('bar_graph_cases', 'figure'),
@@ -462,40 +473,23 @@ def build_graph1(country_input, govt_rest):
     # df_2 = pd.DataFrame(new_df2)
     if govt_rest == 'School closing':
         fig = drawLinegraph(df_1, 'SchoolClosing_', country_input)
-
-        return fig
     elif govt_rest == 'Workplace closing':
         fig = drawLinegraph(df_1, 'WorkPlaceClosing_', country_input)
-
-        return fig
     elif govt_rest == 'Stay at home requirements':
         fig = drawLinegraph(df_1, 'StayHomeRestriction_', country_input)
-
-        return fig
     elif govt_rest == 'Restrictions on gatherings':
         fig = drawLinegraph(df_1, 'GatherRestriction_', country_input)
-
-        return fig
     elif govt_rest == 'Close public transport':
         fig = drawLinegraph(df_1, 'TransportRestriction_', country_input)
-
-        return fig
     elif govt_rest == 'International travel controls':
         fig = drawLinegraph(df_1, 'InternationalTravelRestriction_', country_input)
-
-        return fig
     elif govt_rest == 'Restriction on Retail':
         fig = drawLinegraph(df_1, 'Retail_Restriction_', country_input)
-
-        return fig
     elif govt_rest == "Restriction on pharmacy":
         fig = drawLinegraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
-
-        return fig
     elif govt_rest == "Restriction on park":
         fig = drawLinegraph(df_1, 'Park_Restriction_', country_input)
-
-        return fig
+    return fig
 
 
 def drawLinegraph(Dframe, x, country):
@@ -586,8 +580,7 @@ def build_map(case, input_date_range):
     fig_map = px.choropleth(data_frame=df_merged_date_filtered, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
                             projection="miller", color_continuous_scale='reds',
-                            title='Total COVID-19 Cases Across Europe',
-                            height=400)  # , template='plotly_dark')
+                            title='Total COVID-19 Cases Across Europe')  # , template='plotly_dark')
 
     fig_map.update_layout(title=dict(font=dict(size=20)))
     return fig_map
