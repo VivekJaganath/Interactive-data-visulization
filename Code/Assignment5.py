@@ -200,6 +200,15 @@ app.layout = html.Div([
             ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%',
             'height':'70px', 'width':'92%',
                 'max-width':'92%'}),
+            dcc.RadioItems(id='graphType',
+                     options=[{'label': 'Bar Graph', 'value': 'B'},
+                              {'label': 'Line Graph', 'value': 'L'}],
+                     value='L', labelStyle={'display': 'inline-block'},
+                     style={'float':'left', 'margin-left':'550px',
+                     'background-color':'white',
+                     'height': '30px',
+                     'width':'500px'
+                     }),
     html.Hr(style={'margin-top':'20px','margin-left':'4%','float':'left',
     'border-top':'3px solid #bbb',
     'width':'92%',
@@ -232,7 +241,7 @@ app.layout = html.Div([
                 }),
         
     html.Div([
-        html.H1("Comparison of European Nations with Germany", className='twelve columns', style={'textAlign': 'center',
+        html.H1("Comparison of Policy Measures with Germany", className='twelve columns', style={'textAlign': 'center',
                 'height':'30px',
                 'font-size':'30px',
                 'background-color':'white',
@@ -291,7 +300,7 @@ app.layout = html.Div([
                 'background-color':'white',
                 }),  
     html.Div([
-        html.H1("Comparison of Important Policy Milestones", className='twelve columns', style={'textAlign': 'center',
+        html.H1("Comparison of Important Policy Milestones with Germany", className='twelve columns', style={'textAlign': 'center',
                 'height':'30px',
                 'font-size':'30px',
                 'background-color':'white',
@@ -310,7 +319,7 @@ app.layout = html.Div([
              columns=[{"name": i, "id": i}
                       for i in data_table_visulaization_df.columns],
              # data=data_table_visulaization_df.to_dict('records'),
-             page_size=20,  # we have less data in this example, so setting to 20
+             page_size=10,  # we have less data in this example, so setting to 20
              #style_table={'height': '300px', 'overflowY': 'auto'},
              style_header={
                  'backgroundColor': 'rgb(230, 230, 230)',
