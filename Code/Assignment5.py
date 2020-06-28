@@ -145,6 +145,27 @@ app.layout = html.Div([
     ##Space Div##    
     html.Div(className='twelve columns', style={'height':'50px'}),
 
+    #########Selection of country###########
+    html.Div([
+        html.H6("Select the country to generate trends in comparison with Germany",style={'float':'left','margin-top':'10px','margin-bottom':'10px',
+                     'margin-left':'2%','height': '30px'}),
+        
+        dcc.Dropdown(id='country',
+                     options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
+                              ['country'].unique()], value='Albania', clearable=True, searchable=True,
+                     placeholder='Choose Country...', style={'float':'left',
+                     'height': '30px',
+                     'margin-top':'4px','width':'50%',
+                     'margin-left':'2%'})
+    ],style={'float':'left','display':'inline-block','background-color':'white', 'width':'92%',
+    'max-width':'92%','height':'50px', 'margin-left':'4%','margin-right':'4%',
+    'box-shadow':'5px 5px 5px #888888'}),
+
+    #########Selection of country###########
+
+    ##Space Div##    
+    html.Div(className='twelve columns', style={'height':'30px'}),
+
     ##Trend Graphs##
     html.Div(
         [html.Div([
@@ -160,7 +181,8 @@ app.layout = html.Div([
                 'margin-left':'4%',
                 'background-color':'white',
                 'margin-bottom':'0px',
-                'font-family':'Comic Sans MS'})], 
+                'font-family':'Comic Sans MS'}),
+                ], 
                 style={'float':'left','margin-left':'4%',
                 'margin-right':'4%','margin-bottom':'0px',
                 'width':'82%',
@@ -190,7 +212,7 @@ app.layout = html.Div([
     ##Trend Graphs##
 
     html.Div(className='twelve columns', style={'float':'left','width':'92%',
-                'max-width':'92%','height':'50px'}),
+                'max-width':'92%','height':'30px'}),
     
     ##Comparison Graphs##
     html.Div(
@@ -210,15 +232,9 @@ app.layout = html.Div([
                 style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
                 }),
         #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
-        html.H6("Select the Country to compare with Germany",style={'float':'left','margin-top':'10px','margin-bottom':'10px',
-                     'margin-left':'10%','height': '30px', 'width': '40%','text-align':'center'}),
+        
         html.H6("Select the Policy Measure",style={'float':'right','margin-top':'10px','margin-bottom':'10px',
                      'margin-right':'10%','height': '30px', 'width': '40%','text-align':'center'}),
-        dcc.Dropdown(id='country',
-                     options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
-                              ['country'].unique()], value='Albania', clearable=True, searchable=True,
-                     placeholder='Choose Country...', style={'float':'left',
-                     'margin-left':'10%','height': '40px', 'width': '40%'}),
         dcc.Dropdown(id='GovtRestriction',
                                options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
                                ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
@@ -230,33 +246,33 @@ app.layout = html.Div([
     html.Div([
         dcc.Graph(id='line_graph1'),
     ],
-        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
+        style={'float':'left','background-color':'white','height':'400px', 'width':'50%',
               'margin-bottom':'2%'}),
     html.Div([dcc.Graph(id='bar_graph_mean'),
               #html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
               ],
-        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
+        style={'float':'left','background-color':'white','height':'400px', 'width':'50%',
               'margin-bottom':'2%'}),
     ###############
     html.Div([
         dcc.Graph(id='bar_graph_deaths'),
     ],
-        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
+        style={'float':'left','background-color':'white','height':'300px', 'width':'50%',
               'margin-bottom':'2%'}),
     html.Div([dcc.Graph(id='bar_graph_cases'),
               #html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
               ],
-        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
+        style={'float':'left','background-color':'white','height':'300px', 'width':'50%',
               'margin-bottom':'2%'})
     ###############
     ],
-    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1000px',
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1100px',
     'margin-left':'4%','margin-right':'4%','width':'92%',
                 'max-width':'92%'}),          
     ##Comparison Graphs##
 
     ##Milestone Comparison##
-    html.Div(className='twelve columns', style={'height':'100px'}),
+    html.Div(className='twelve columns', style={'height':'30px'}),
 
      html.Div([
         html.Div([
