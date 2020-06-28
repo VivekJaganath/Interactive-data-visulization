@@ -154,7 +154,7 @@ app.layout = html.Div([
         
         dcc.Dropdown(id='country',
                      options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
-                              ['country'].unique()], value='Albania', clearable=True, searchable=True,
+                              ['country'].unique()], value='United Kingdom', clearable=True, searchable=True,
                      placeholder='Choose Country...', style={'float':'left',
                      'height': '30px',
                      'width':'52%',
@@ -179,7 +179,7 @@ app.layout = html.Div([
                 }),
         
     html.Div([
-        html.H1("Comparison of general trends", className='twelve columns', style={'textAlign': 'center',
+        html.H1("Comparing general trends", className='twelve columns', style={'textAlign': 'center',
                 'height':'30px',
                 'font-size':'30px',
                 'margin-left':'4%',
@@ -519,16 +519,15 @@ def build_bargraph(country_input, input_date_range,gtype):
 
         return fig, fig1
     else:
-        fig = px.line(df_merge1,x=df_merge1['date'],y=['new_cases_Germany','new_cases_' + country_input],title='comparision of new cases of '+country_input+' against Germany')
+        fig = px.line(df_merge1,x=df_merge1['date'],y=['new_cases_Germany','new_cases_' + country_input],title='Comparing new cases of '+country_input+' against Germany')
         fig1 = px.line(df_merge1, x=df_merge1['date'], y=['new_deaths_Germany', 'new_deaths_' + country_input],
-                      title='comparision of new deaths of ' + country_input + ' against Germany')
+                      title='Comparing  new deaths of ' + country_input + ' against Germany')
         return fig,fig1
 
 
 # Items from DataSet1 and DataSet2
 @app.callback(
-    Output('line_graph1', 'figure')
-    ,
+    Output('line_graph1', 'figure'),
     [Input('country', 'value'),
     Input("GovtRestriction", "value"),
     Input('slider_date', 'value')])
@@ -538,23 +537,23 @@ def build_graph1(country_input, govt_rest, input_date_range):
     German_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == "Germany")]
     Country_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == country_input)]
     German_data = German_data.rename(
-        {'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
-         'C6_Stay at home requirements': 'StayHomeRestriction_Germany',
-         'C4_Restrictions on gatherings': 'GatherRestriction_Germany',
-         'C5_Close public transport': 'TransportRestriction_Germany',
-         'C8_International travel controls': 'InternationalTravelRestriction_Germany',
-         'retail_and_recreation_percent_change_from_baseline': 'Retail_Restriction_Germany',
-         'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery_Pharmacy_Restriction_Germany',
-         'parks_percent_change_from_baseline': 'Park_Restriction_Germany'}, axis=1)
-    Country_data = Country_data.rename({'C1_School closing': 'SchoolClosing_' + country_input,
-                                        'C2_Workplace closing': 'WorkPlaceClosing_' + country_input,
-                                        'C6_Stay at home requirements': 'StayHomeRestriction_' + country_input,
-                                        'C4_Restrictions on gatherings': 'GatherRestriction_' + country_input,
-                                        'C5_Close public transport': 'TransportRestriction_' + country_input,
-                                        'C8_International travel controls': 'InternationalTravelRestriction_' + country_input,
-                                        'retail_and_recreation_percent_change_from_baseline': 'Retail_Restriction_' + country_input,
-                                        'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery_Pharmacy_Restriction_' + country_input,
-                                        'parks_percent_change_from_baseline': 'Park_Restriction_' + country_input},
+        {'C1_School closing': 'School Closing Germany', 'C2_Workplace closing': 'WorkPlace Closing Germany',
+         'C6_Stay at home requirements': 'StayHome Restriction Germany',
+         'C4_Restrictions on gatherings': 'Gather Restriction Germany',
+         'C5_Close public transport': 'Transport Restriction Germany',
+         'C8_International travel controls': 'International Travel Restriction Germany',
+         'retail_and_recreation_percent_change_from_baseline': 'Retail Restriction Germany',
+         'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery Pharmacy Restriction Germany',
+         'parks_percent_change_from_baseline': 'Park Restriction Germany'}, axis=1)
+    Country_data = Country_data.rename({'C1_School closing': 'School Closing ' + country_input,
+                                        'C2_Workplace closing': 'WorkPlace Closing ' + country_input,
+                                        'C6_Stay at home requirements': 'StayHome Restriction ' + country_input,
+                                        'C4_Restrictions on gatherings': 'Gather Restriction ' + country_input,
+                                        'C5_Close public transport': 'Transport Restriction ' + country_input,
+                                        'C8_International travel controls': 'International Travel Restriction ' + country_input,
+                                        'retail_and_recreation_percent_change_from_baseline': 'Retail Restriction ' + country_input,
+                                        'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery Pharmacy Restriction ' + country_input,
+                                        'parks_percent_change_from_baseline': 'Park Restriction ' + country_input},
                                        axis=1)
     df_merge = pd.merge(German_data, Country_data, on='date')
     # print(df_merge2['date'])
@@ -563,23 +562,23 @@ def build_graph1(country_input, govt_rest, input_date_range):
     df_1 = pd.DataFrame(new_df)
     # df_2 = pd.DataFrame(new_df2)
     if govt_rest == 'School closing':
-        fig = drawLinegraph(df_1, 'SchoolClosing_', country_input)
+        fig = drawLinegraph(df_1, 'School Closing ', country_input)
     elif govt_rest == 'Workplace closing':
-        fig = drawLinegraph(df_1, 'WorkPlaceClosing_', country_input)
+        fig = drawLinegraph(df_1, 'WorkPlace Closing ', country_input)
     elif govt_rest == 'Stay at home requirements':
-        fig = drawLinegraph(df_1, 'StayHomeRestriction_', country_input)
+        fig = drawLinegraph(df_1, 'StayHome Restriction ', country_input)
     elif govt_rest == 'Restrictions on gatherings':
-        fig = drawLinegraph(df_1, 'GatherRestriction_', country_input)
+        fig = drawLinegraph(df_1, 'Gather Restriction ', country_input)
     elif govt_rest == 'Close public transport':
-        fig = drawLinegraph(df_1, 'TransportRestriction_', country_input)
+        fig = drawLinegraph(df_1, 'Transport Restriction ', country_input)
     elif govt_rest == 'International travel controls':
-        fig = drawLinegraph(df_1, 'InternationalTravelRestriction_', country_input)
+        fig = drawLinegraph(df_1, 'International Travel Restriction ', country_input)
     elif govt_rest == 'Restriction on Retail':
-        fig = drawLinegraph(df_1, 'Retail_Restriction_', country_input)
+        fig = drawLinegraph(df_1, 'Retail Restriction ', country_input)
     elif govt_rest == "Restriction on pharmacy":
-        fig = drawLinegraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
+        fig = drawLinegraph(df_1, 'Grocery Pharmacy Restriction ', country_input)
     elif govt_rest == "Restriction on park":
-        fig = drawLinegraph(df_1, 'Park_Restriction_', country_input)
+        fig = drawLinegraph(df_1, 'Park Restriction ', country_input)
     return fig
 
 
@@ -606,54 +605,54 @@ def build_graph_mean(country_input, govt_rest, input_date_range):
     German_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == "Germany")]
     Country_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == country_input)]
     German_data = German_data.rename(
-        {'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
-         'C6_Stay at home requirements': 'StayHomeRestriction_Germany',
-         'C4_Restrictions on gatherings': 'GatherRestriction_Germany',
-         'C5_Close public transport': 'TransportRestriction_Germany',
-         'C8_International travel controls': 'InternationalTravelRestriction_Germany',
-         'retail_and_recreation_percent_change_from_baseline': 'Retail_Restriction_Germany',
-         'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery_Pharmacy_Restriction_Germany',
-         'parks_percent_change_from_baseline': 'Park_Restriction_Germany'}, axis=1)
-    Country_data = Country_data.rename({'C1_School closing': 'SchoolClosing_' + country_input,
-                                        'C2_Workplace closing': 'WorkPlaceClosing_' + country_input,
-                                        'C6_Stay at home requirements': 'StayHomeRestriction_' + country_input,
-                                        'C4_Restrictions on gatherings': 'GatherRestriction_' + country_input,
-                                        'C5_Close public transport': 'TransportRestriction_' + country_input,
-                                        'C8_International travel controls': 'InternationalTravelRestriction_' + country_input,
-                                        'retail_and_recreation_percent_change_from_baseline': 'Retail_Restriction_' + country_input,
-                                        'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery_Pharmacy_Restriction_' + country_input,
-                                        'parks_percent_change_from_baseline': 'Park_Restriction_' + country_input},
+        {'C1_School closing': 'School Closing Germany', 'C2_Workplace closing': 'WorkPlace Closing Germany',
+         'C6_Stay at home requirements': 'StayHome Restriction Germany',
+         'C4_Restrictions on gatherings': 'Gather Restriction Germany',
+         'C5_Close public transport': 'Transport Restriction Germany',
+         'C8_International travel controls': 'International Travel Restriction Germany',
+         'retail_and_recreation_percent_change_from_baseline': 'Retail Restriction Germany',
+         'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery Pharmacy Restriction Germany',
+         'parks_percent_change_from_baseline': 'Park Restriction Germany'}, axis=1)
+    Country_data = Country_data.rename({'C1_School closing': 'School Closing ' + country_input,
+                                        'C2_Workplace closing': 'WorkPlace Closing ' + country_input,
+                                        'C6_Stay at home requirements': 'StayHome Restriction ' + country_input,
+                                        'C4_Restrictions on gatherings': 'Gather Restriction ' + country_input,
+                                        'C5_Close public transport': 'Transport Restriction ' + country_input,
+                                        'C8_International travel controls': 'International Travel Restriction ' + country_input,
+                                        'retail_and_recreation_percent_change_from_baseline': 'Retail Restriction ' + country_input,
+                                        'grocery_and_pharmacy_percent_change_from_baseline': 'Grocery Pharmacy Restriction ' + country_input,
+                                        'parks_percent_change_from_baseline': 'Park Restriction ' + country_input},
                                        axis=1)
     df_merge_mean = pd.merge(German_data, Country_data, on='date')
-    df_merge_mean['meanGermany'] = df_merge_mean['SchoolClosing_Germany'].div(9, axis=0) + df_merge_mean[
-        'WorkPlaceClosing_Germany'].div(9, axis=0) + df_merge_mean['StayHomeRestriction_Germany'].div(9, axis=0) + \
+    df_merge_mean['meanGermany'] = df_merge_mean['School Closing Germany'].div(9, axis=0) + df_merge_mean[
+        'WorkPlace Closing Germany'].div(9, axis=0) + df_merge_mean['StayHome Restriction Germany'].div(9, axis=0) + \
                                    df_merge_mean[
-                                       'GatherRestriction_Germany'].div(9, axis=0) + df_merge_mean[
-                                       'TransportRestriction_Germany'].div(9, axis=0) + df_merge_mean[
-                                       'InternationalTravelRestriction_Germany'].div(9, axis=0) + df_merge_mean[
-                                       'Retail_Restriction_Germany'].div(9, axis=0) + df_merge_mean[
-                                       'Grocery_Pharmacy_Restriction_Germany'].div(9, axis=0) + df_merge_mean[
-                                       'Park_Restriction_Germany'].div(9, axis=0)
-    df_merge_mean['meanCountry'] = df_merge_mean['SchoolClosing_' + country_input].div(9, axis=0) + df_merge_mean[
-        'WorkPlaceClosing_' + country_input].div(9, axis=0) + df_merge_mean['StayHomeRestriction_' + country_input].div(
+                                       'Gather Restriction Germany'].div(9, axis=0) + df_merge_mean[
+                                       'Transport Restriction Germany'].div(9, axis=0) + df_merge_mean[
+                                       'International Travel Restriction Germany'].div(9, axis=0) + df_merge_mean[
+                                       'Retail Restriction Germany'].div(9, axis=0) + df_merge_mean[
+                                       'Grocery Pharmacy Restriction Germany'].div(9, axis=0) + df_merge_mean[
+                                       'Park Restriction Germany'].div(9, axis=0)
+    df_merge_mean['meanCountry'] = df_merge_mean['School Closing ' + country_input].div(9, axis=0) + df_merge_mean[
+        'WorkPlace Closing ' + country_input].div(9, axis=0) + df_merge_mean['StayHome Restriction ' + country_input].div(
         9, axis=0) + df_merge_mean[
-                                       'GatherRestriction_' + country_input].div(9, axis=0) + df_merge_mean[
-                                       'TransportRestriction_' + country_input].div(9, axis=0) + df_merge_mean[
-                                       'InternationalTravelRestriction_' + country_input].div(9, axis=0) + \
+                                       'Gather Restriction ' + country_input].div(9, axis=0) + df_merge_mean[
+                                       'Transport Restriction ' + country_input].div(9, axis=0) + df_merge_mean[
+                                       'International Travel Restriction ' + country_input].div(9, axis=0) + \
                                    df_merge_mean[
-                                       'Retail_Restriction_' + country_input].div(9, axis=0) + df_merge_mean[
-                                       'Grocery_Pharmacy_Restriction_' + country_input].div(9, axis=0) + df_merge_mean[
-                                       'Park_Restriction_' + country_input].div(9, axis=0)
+                                       'Retail Restriction ' + country_input].div(9, axis=0) + df_merge_mean[
+                                       'Grocery Pharmacy Restriction ' + country_input].div(9, axis=0) + df_merge_mean[
+                                       'Park Restriction ' + country_input].div(9, axis=0)
     df_merge_mean['meanGermany'] = df_merge_mean['meanGermany'].fillna(0)
     df_merge_mean['meanCountry'] = df_merge_mean['meanCountry'].fillna(0)
 
     df_merge_mean = df_merge_mean.rename(
-        {'meanGermany': 'Overall_Restriction_Germany', 'meanCountry': 'Overall_Restriction_' + country_input}, axis=1)
+        {'meanGermany': 'Overall Restriction Germany', 'meanCountry': 'Overall Restriction ' + country_input}, axis=1)
 
     new_df_mean = pd.DataFrame(df_merge_mean)
     df_1_mean = pd.DataFrame(new_df_mean)
 
-    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input])
+    fig = px.line(df_1_mean, x='date', y=['Overall Restriction Germany', 'Overall Restriction '+country_input])
     fig.update_layout(title_text='MEAN of all Policy Measures')
     return fig
 
