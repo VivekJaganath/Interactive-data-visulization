@@ -107,9 +107,9 @@ app.layout = html.Div([
     html.Div(className='twelve columns', style={'height':'50px'}),
 
     html.Div([
-        html.Div([dcc.Graph(id='the_graph',style={'height':'520px'}),
+        html.Div([dcc.Graph(id='the_graph', style={'width':'1000 px'}),
               ], className='twelve columns', style={'float':'left',
-              'max-width':'68%',
+              'max-width':'80%',
               'height':'400px',
               'max-height':'400px',
               'display' : 'inline-block'}),
@@ -122,8 +122,8 @@ app.layout = html.Div([
                               {'label': 'Recovered', 'value': 'R'}],
                      value='C', style={'float':'left', 'margin-left':'10px',
                      'background-color':'white',
-                     'height': '100px',
-                     'width':'150px',
+                     'height': '150px',
+                     'width':'100px',
                      #'max-width':'30%','font-size':'25px'
                      }),
         dcc.Textarea(
@@ -132,11 +132,11 @@ app.layout = html.Div([
         readOnly='readOnly',
         draggable='false',
         disabled='true',
-        style={'background-color':'white','float':'left','border-color':'white', 'height':'250px', 'width':'400px'
+        style={'background-color':'white','float':'left','border-color':'white', 'height':'250px', 'width':'100px'
         },
     )
     ], className='two columns', style={'height':'400px','float':'left','display' : 'inline-block',
-    'margin-left':'10px','background-color':'white','max-width':'30%'}),
+    'margin-left':'10px','background-color':'white','max-width':'20%'}),
     #############################
     
     ],style={'float':'left','display':'inline-block','background-color':'white','max-width':'92%','height':'520px', 'margin-left':'4%','margin-right':'4%',
@@ -586,12 +586,14 @@ def build_map(case, input_date_range):
     else:
         case_chosen = 'total_cases'
 
+
+
     fig_map = px.choropleth(data_frame=df_merged_date_filtered, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
-                            projection="miller", color_continuous_scale='reds',
+                            projection="equirectangular", color_continuous_scale="Blues",
                             title='Total COVID-19 Cases Across Europe')  # , template='plotly_dark')
 
-    fig_map.update_layout(title=dict(font=dict(size=20)))
+    fig_map.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
     return fig_map
 
 
