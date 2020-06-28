@@ -12,18 +12,18 @@ import plotly.graph_objects as go
 import xlrd
 from plotly.validators.layout import _plot_bgcolor
 
-external_stylesheets = ['styles.css']
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # Data Files
 # Source : https://www.acaps.org/covid19-government-measures-dataset
-govern_measures_data_file = "datasets/acaps_covid19_government_measures_dataset_0.xlsx"
+govern_measures_data_file = "Code/datasets/acaps_covid19_government_measures_dataset_0.xlsx"
 
-govern_restrictions_data_file = "datasets/Dataset1.csv"
+govern_restrictions_data_file = "Code/datasets/Dataset1.csv"
 
 # Source : https://raw.githubusercontent.com/OxCGRT/covid-policy-tracker/master/data/OxCGRT_latest.csv
-owid_covid_data_file = "datasets/owid-covid-data.csv"
+owid_covid_data_file = "Code/datasets/owid-covid-data.csv"
 
-recoveries_data_file = "datasets/time_series_covid19_recovered_global.csv"
+recoveries_data_file = "Code/datasets/time_series_covid19_recovered_global.csv"
 
 # Reading data for covid statistics and recovery
 df_merged, df_merged_raw, df_europe_cases = dh.read_data_covid_and_recovery(
@@ -43,10 +43,10 @@ date_num_encoder, number_date_range_dict, slider_marks_dict  = dh.generate_slide
 #############################################################################
 
 # Intializing the json file which will be used for Geo visualization
-with open('europe_geo.json') as json_file:
+with open('Code/europe_geo.json') as json_file:
     europe_geo_json = json.load(json_file)
 
-external_stylesheets = ['Code/assets/styles.css']
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 # app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)

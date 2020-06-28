@@ -15,4 +15,4 @@ Currently, the project is tested to run with python3, so please ensure you are u
 
 Execute the source code:
 
-> ``` bin/python miniproject/Code/Assignment5.py ```
+> ``` bin/python Code/Assignment5.py ```
