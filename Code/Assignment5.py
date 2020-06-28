@@ -103,11 +103,15 @@ app.layout = html.Div([
         dcc.Dropdown(id='GovtRestriction',
                      options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
                      ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
-                     placeholder='Choose restriction...', style={'height': '40px', 'width': '1500px'}, )
+                     placeholder='Choose restriction...', style={'height': '40px', 'width': '1500px'}, ),
+        dcc.Dropdown(id='Type of Graph',
+                     options=[{'label': 'LineGraph', 'value': 'Line graph'}, {'label': 'BarGraph', 'value': 'Bar graph'}],
+                     value='Line graph', clearable=True, searchable=True,
+                     placeholder='Choose Graph Type...', style={'height': '30px', 'width': '200px'})
     ], className='ten columns'),
     html.Div([
         dcc.Graph(id='line_graph'),
-    ], className='four columns'),
+    ], className='six columns'),
     html.Div([
         dcc.Graph(id='bar_graph_cases'),
 
@@ -206,6 +210,7 @@ def build_graph(country_input, input_date_range):
      Output('bar_graph_deaths', 'figure')],
     [Input('country', 'value'),
      Input('slider_date', 'value')])
+
 def build_bargraph(country_input, input_date_range):
     # Filtering the results based on input date range
     df_merged_filtered = dh.handle_updated_dates(df_merged, 'date', input_date_range, number_date_range_dict)
@@ -226,11 +231,13 @@ def build_bargraph(country_input, input_date_range):
         go.Bar(name='new_cases_of_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
         go.Bar(name='new_cases_' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
     ])
+    fig.update_layout(title='Comparing new COVID cases ' + 'of ' + country_input + ' against Germany')
     fig1 = go.Figure(data=[
         go.Bar(name='new_deaths_Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='new_deaths_' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
 
     ])
+    fig1.update_layout(title='Comparing new COVID deaths ' + 'of ' + country_input + ' against Germany')
 
     return fig, fig1
 
@@ -239,9 +246,9 @@ def build_bargraph(country_input, input_date_range):
 @app.callback(
     Output('line_graph1', 'figure')
     ,
-    [Input('country', 'value'), Input("GovtRestriction", "value")],
+    [Input('country', 'value'), Input("GovtRestriction", "value"),Input("Type of Graph","value")],
 )
-def build_graph1(country_input, govt_rest):
+def build_graph1(country_input, govt_rest,gType):
     German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
     Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
     German_data = German_data.rename(
@@ -270,39 +277,69 @@ def build_graph1(country_input, govt_rest):
     df_1 = pd.DataFrame(new_df)
     # df_2 = pd.DataFrame(new_df2)
     if govt_rest == 'School closing':
-        fig = drawLinegraph(df_1, 'SchoolClosing_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'SchoolClosing_', country_input)
+        else :
+            fig = drawBargraph(df_1, 'SchoolClosing_', country_input)
 
         return fig
     elif govt_rest == 'Workplace closing':
-        fig = drawLinegraph(df_1, 'WorkPlaceClosing_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'WorkPlaceClosing_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'WorkPlaceClosing_', country_input)
 
         return fig
     elif govt_rest == 'Stay at home requirements':
-        fig = drawLinegraph(df_1, 'StayHomeRestriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'StayHomeRestriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'StayHomeRestriction_', country_input)
+
 
         return fig
     elif govt_rest == 'Restrictions on gatherings':
-        fig = drawLinegraph(df_1, 'GatherRestriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'GatherRestriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'GatherRestriction_', country_input)
 
         return fig
     elif govt_rest == 'Close public transport':
-        fig = drawLinegraph(df_1, 'TransportRestriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'TransportRestriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'TransportRestriction_', country_input)
 
         return fig
     elif govt_rest == 'International travel controls':
-        fig = drawLinegraph(df_1, 'InternationalTravelRestriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'InternationalTravelRestriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'InternationalTravelRestriction_', country_input)
+
 
         return fig
     elif govt_rest == 'Restriction on Retail':
-        fig = drawLinegraph(df_1, 'Retail_Restriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'Retail_Restriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'Retail_Restriction_', country_input)
+
 
         return fig
     elif govt_rest == "Restriction on pharmacy":
-        fig = drawLinegraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
 
         return fig
     elif govt_rest == "Restriction on park":
-        fig = drawLinegraph(df_1, 'Park_Restriction_', country_input)
+        if gType == 'Line graph':
+            fig = drawLinegraph(df_1, 'Park_Restriction_', country_input)
+        else:
+            fig = drawBargraph(df_1, 'Park_Restriction_', country_input)
 
         return fig
 
@@ -314,6 +351,15 @@ def drawLinegraph(Dframe, x, country):
                   y=[b, c],
                   height=720, width=980,
                   title='Comparing' + x + 'of ' + country + ' against Germany')
+    return fig
+
+def drawBargraph(Dframe, x, country):
+    b = x + 'Germany'
+    c = x + country
+    fig = go.Figure(data=[
+        go.Bar(name='new_cases_of_Germany', x=Dframe['date'], y=Dframe[b]),
+        go.Bar(name='new_cases_' + country, x=Dframe['date'], y=Dframe[c])
+    ])
     return fig
 
 
@@ -373,7 +419,7 @@ def build_graph_mean(country_input, govt_rest):
     new_df_mean = pd.DataFrame(df_merge_mean)
     df_1_mean = pd.DataFrame(new_df_mean)
 
-    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input])
+    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input],title='Comparing overall restriction imposed by ' + country_input + ' against Germany')
 
     return fig
 
