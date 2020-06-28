@@ -240,7 +240,8 @@ app.layout = html.Div([
         
         html.H6("Select the Policy Measure : ",style={'float':'left','margin-top':'15px','margin-bottom':'10px',
                     'margin-left':'10%',
-                    'height': '30px', 'width': '40%','text-align':'right'}),
+                    'height': '30px', 'width': '40%','text-align':'right',
+                    'font-family':'Comic Sans MS'}),
         dcc.Dropdown(id='GovtRestriction',
                                options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
                                ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
@@ -251,6 +252,15 @@ app.layout = html.Div([
             ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
             'height':'150px'}),
     html.Hr(style={'float':'left','margin-top':'5px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
+    html.H1("Policy Measures", className='twelve columns', style={'textAlign': 'center',
+                'height':'50px',
+                'color':'white',
+                'font-size':'30px',
+                'margin-left':'5%',
+                'width':'90%',
+                'background-color':'#609af0',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'}),
     html.Div([
         dcc.Graph(id='line_graph1'),
     ],
@@ -262,15 +272,26 @@ app.layout = html.Div([
         style={'float':'left','background-color':'white','height':'400px', 'width':'50%',
               'margin-bottom':'2%'}),
     ###############
-    html.Hr(style={'float':'left','margin-top':'30px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
+    #html.Hr(style={'float':'left','margin-top':'30px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
+    html.H1("Impact of Policy Measures", className='twelve columns', style={'textAlign': 'center',
+                'margin-top':'30px',
+                'height':'50px',
+                'margin-left':'5%',
+                'color':'white',
+                'width':'90%',
+                'font-size':'30px',
+                'background-color':'#609af0',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'}),
     dcc.RadioItems(id='graphType',
                      options=[{'label': 'Bar Graph', 'value': 'B'},
                               {'label': 'Line Graph', 'value': 'L'}],
                      value='L', labelStyle={'display': 'inline-block'},
                      style={'float':'left', 'margin-left':'550px',
-                     'background-color':'white',
+                     'margin-top':'10px',
+                     'background-color':'#dbe9ff',
                      'height': '30px',
-                     'width':'500px'
+                     'width':'190px'
                      }),
     ###############
     html.Div([
@@ -284,7 +305,7 @@ app.layout = html.Div([
         style={'float':'left','background-color':'white','height':'300px', 'width':'50%',
               'margin-bottom':'2%'})
     ],
-    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1200px',
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1300px',
     'margin-left':'5%','margin-right':'5%','width':'90%',
                 'max-width':'90%'}),          
     ##Comparison Graphs##
