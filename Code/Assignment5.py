@@ -180,7 +180,7 @@ app.layout = html.Div([
         style={'float':'left','background-color':'white','height':'470px', 'width':'49%',
               'margin-bottom':'2%'}),
     html.Div([
-        dcc.Graph(id='bar_graph_mean')
+        dcc.Graph(id='bar_graph')
     ],
         style={'float':'left','background-color':'white','height':'470px', 'width':'49%',
               'margin-bottom':'2%'}),
@@ -232,13 +232,25 @@ app.layout = html.Div([
     ],
         style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
               'margin-bottom':'2%'}),
-    html.Div([dcc.Graph(id='bar_graph'),
+    html.Div([dcc.Graph(id='bar_graph_mean'),
               #html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
               ],
-        style={'float':'left','background-color':'white','height':'250px', 'width':'49%',
+        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
               'margin-bottom':'2%'}),
+    ###############
+    html.Div([
+        dcc.Graph(id='bar_graph_deaths'),
     ],
-    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'650px',
+        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
+              'margin-bottom':'2%'}),
+    html.Div([dcc.Graph(id='bar_graph_cases'),
+              #html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
+              ],
+        style={'float':'left','background-color':'white','height':'250px', 'width':'50%',
+              'margin-bottom':'2%'})
+    ###############
+    ],
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1000px',
     'margin-left':'4%','margin-right':'4%','width':'92%',
                 'max-width':'92%'}),          
     ##Comparison Graphs##
@@ -581,4 +593,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    app.run_server(debug=False)
+    app.run_server(debug=True)
