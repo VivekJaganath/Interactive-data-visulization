@@ -297,7 +297,7 @@ app.layout = html.Div([
                 'background-color':'white',
                 }),  
     html.Div([
-        html.H1("Important Policy Milestones", className='twelve columns', style={'textAlign': 'center',
+        html.H1("Comparison of Important Policy Milestones with Germany", className='twelve columns', style={'textAlign': 'center',
                 'height':'30px',
                 'font-size':'30px',
                 'background-color':'white',
@@ -466,8 +466,8 @@ def build_graph(country_input, input_date_range):
     [Output('bar_graph_cases', 'figure'),
      Output('bar_graph_deaths', 'figure')],
     [Input('country', 'value'),
-     Input('slider_date', 'value')])
-def build_bargraph(country_input, input_date_range):
+     Input('slider_date', 'value'),Input('graphType','value')])
+def build_bargraph(country_input, input_date_range,gtype):
     # Filtering the results based on input date range
     df_merged_filtered = dh.handle_updated_dates(df_merged, 'date', input_date_range, number_date_range_dict)
 
@@ -482,32 +482,40 @@ def build_bargraph(country_input, input_date_range):
     df_merge1 = pd.DataFrame(df_merge1)
 
     #print(df_merge1.info())
-
-    fig = go.Figure(data=[
+    if gtype == "B":
+        fig = go.Figure(data=[
         go.Bar(name='New cases in Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
         go.Bar(name='New cases in ' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
     ])
-    fig.update_layout(title_text='Comparing new cases in ' + country_input + ' against Germany',
+        fig.update_layout(title_text='Comparing new cases in ' + country_input + ' against Germany',
                       xaxis_title='Date', yaxis_title='Cases')
-    fig1 = go.Figure(data=[
+        fig1 = go.Figure(data=[
         go.Bar(name='New deaths in Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='New deaths in ' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
     ])
-    fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
+        fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
                        xaxis_title='Date', yaxis_title='Cases')
 
-    return fig, fig1
+        return fig, fig1
+    else:
+        fig = px.line(df_merge1,x=df_merge1['date'],y=['new_cases_Germany','new_cases_' + country_input],title='comparision of new cases of '+country_input+' against Germany')
+        fig1 = px.line(df_merge1, x=df_merge1['date'], y=['new_deaths_Germany', 'new_deaths_' + country_input],
+                      title='comparision of new deaths of ' + country_input + ' against Germany')
+        return fig,fig1
 
 
 # Items from DataSet1 and DataSet2
 @app.callback(
     Output('line_graph1', 'figure')
     ,
-    [Input('country', 'value'), Input("GovtRestriction", "value")],
-)
-def build_graph1(country_input, govt_rest):
-    German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
-    Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
+    [Input('country', 'value'),
+    Input("GovtRestriction", "value"),
+    Input('slider_date', 'value')])
+def build_graph1(country_input, govt_rest, input_date_range):
+
+    filtered_Dataset1 = dh.handle_updated_dates(DataSet1, 'date', input_date_range, number_date_range_dict)
+    German_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == "Germany")]
+    Country_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == country_input)]
     German_data = German_data.rename(
         {'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
          'C6_Stay at home requirements': 'StayHomeRestriction_Germany',
@@ -566,13 +574,16 @@ def drawLinegraph(Dframe, x, country):
 
 
 @app.callback(
-    Output('bar_graph_mean', 'figure')
-    ,
-    [Input('country', 'value'), Input("GovtRestriction", "value")],
+    Output('bar_graph_mean', 'figure'),
+    [Input('country', 'value'),
+    Input("GovtRestriction", "value"),
+    Input('slider_date', 'value')],
 )
-def build_graph_mean(country_input, govt_rest):
-    German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
-    Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
+def build_graph_mean(country_input, govt_rest, input_date_range):
+
+    filtered_Dataset1 = dh.handle_updated_dates(DataSet1, 'date', input_date_range, number_date_range_dict)
+    German_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == "Germany")]
+    Country_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == country_input)]
     German_data = German_data.rename(
         {'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
          'C6_Stay at home requirements': 'StayHomeRestriction_Germany',
@@ -639,8 +650,6 @@ def build_map(case, input_date_range):
         case_chosen = 'total_deaths'
     else:
         case_chosen = 'total_cases'
-
-
 
     fig_map = px.choropleth(data_frame=df_merged_date_filtered, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
