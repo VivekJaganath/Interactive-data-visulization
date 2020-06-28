@@ -437,12 +437,13 @@ def build_bargraph(country_input, input_date_range):
         go.Bar(name='new_cases_of_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
         go.Bar(name='new_cases_' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
     ])
+    fig.update_layout(title_text='New Cases corresponding to selected Policy Measure')
     fig1 = go.Figure(data=[
         go.Bar(name='new_deaths_Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='new_deaths_' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
 
     ])
-
+    fig1.update_layout(title_text='New Deaths corresponding to selected Policy Measure')
     return fig, fig1
 
 
@@ -506,8 +507,9 @@ def drawLinegraph(Dframe, x, country):
     c = x + country
     fig = px.line(Dframe, x='date',
                   y=[b, c],
-                  height=400, width=600,
-                  title='Comparing ' + x + ' of ' + country + ' against Germany')
+                  #height=450, width=600
+                  )
+    fig.update_layout(title_text='Comparing ' + x + ' of ' + country + ' against Germany')
     return fig
 
 
@@ -568,7 +570,7 @@ def build_graph_mean(country_input, govt_rest):
     df_1_mean = pd.DataFrame(new_df_mean)
 
     fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input])
-
+    fig.update_layout(title_text='MEAN of all Policy Measures')
     return fig
 
 
