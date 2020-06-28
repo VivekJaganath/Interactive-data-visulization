@@ -295,7 +295,7 @@ app.layout = html.Div([
                 'background-color':'white',
                 }),  
     html.Div([
-        html.H1("Important Policy Milestones", className='twelve columns', style={'textAlign': 'center',
+        html.H1("Comparison of Important Policy Milestones with Germany", className='twelve columns', style={'textAlign': 'center',
                 'height':'30px',
                 'font-size':'30px',
                 'background-color':'white',
