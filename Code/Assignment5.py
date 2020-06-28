@@ -204,12 +204,12 @@ app.layout = html.Div([
     html.Div([
         dcc.Graph(id='line_graph'),
     ],
-        style={'float':'left','background-color':'white','height':'470px', 'width':'49%',
+        style={'float':'left','background-color':'white','height':'400px', 'width':'49%',
               'margin-bottom':'2%'}),
     html.Div([
         dcc.Graph(id='bar_graph')
     ],
-        style={'float':'left','background-color':'white','height':'470px', 'width':'49%',
+        style={'float':'left','background-color':'white','height':'400px', 'width':'49%',
               'margin-bottom':'2%'}),
     ],
     style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'650px',
@@ -254,12 +254,12 @@ app.layout = html.Div([
     html.Div([
         dcc.Graph(id='line_graph1'),
     ],
-        style={'float':'left','background-color':'white','height':'400px', 'width':'50%',
+        style={'float':'left','background-color':'white','height':'300px', 'width':'50%',
               'margin-bottom':'2%'}),
     html.Div([dcc.Graph(id='bar_graph_mean'),
               #html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
               ],
-        style={'float':'left','background-color':'white','height':'400px', 'width':'50%',
+        style={'float':'left','background-color':'white','height':'300px', 'width':'50%',
               'margin-bottom':'2%'}),
     ###############
     html.Hr(style={'float':'left','margin-top':'30px','margin-left':'4%','width':'92%','border-top':'3px solid #bbb'}),
@@ -481,6 +481,7 @@ def build_bargraph(country_input, input_date_range,gtype):
 
     df_merge1 = pd.DataFrame(df_merge1)
 
+<<<<<<< Updated upstream
     #print(df_merge1.info())
     if gtype == "B":
         fig = go.Figure(data=[
@@ -492,6 +493,18 @@ def build_bargraph(country_input, input_date_range,gtype):
         fig1 = go.Figure(data=[
         go.Bar(name='New deaths in Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='New deaths in ' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
+=======
+    print(df_merge1.info())
+
+    fig = go.Figure(layout={"template":"seaborn"}, data=[
+        go.Bar(name='new_cases_of_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
+        go.Bar(name='new_cases_' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
+    ])
+    fig1 = go.Figure(layout={"template":"seaborn"}, data=[
+        go.Bar(name='new_deaths_Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
+        go.Bar(name='new_deaths_' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
+
+>>>>>>> Stashed changes
     ])
         fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
                        xaxis_title='Date', yaxis_title='Cases')
@@ -566,9 +579,13 @@ def drawLinegraph(Dframe, x, country):
     c = x + country
     fig = px.line(Dframe, x='date',
                   y=[b, c],
+<<<<<<< Updated upstream
                   #height=450, width=600
                   )
     fig.update_layout(title_text='Comparing ' + x + ' of ' + country + ' against Germany')
+=======
+                  title='Comparing ' + x + ' of ' + country + ' against Germany', template="seaborn")
+>>>>>>> Stashed changes
     return fig
 
 
@@ -626,13 +643,22 @@ def build_graph_mean(country_input, govt_rest, input_date_range):
     df_merge_mean['meanCountry'] = df_merge_mean['meanCountry'].fillna(0)
 
     df_merge_mean = df_merge_mean.rename(
+<<<<<<< Updated upstream
         {'meanGermany': 'Overall Restriction Germany', 'meanCountry': 'Overall Restriction ' + country_input}, axis=1)
+=======
+        {'meanGermany': 'Restriction_Germany', 'meanCountry': 'Restriction_' + country_input}, axis=1)
+>>>>>>> Stashed changes
 
     new_df_mean = pd.DataFrame(df_merge_mean)
     df_1_mean = pd.DataFrame(new_df_mean)
 
+<<<<<<< Updated upstream
     fig = px.line(df_1_mean, x='date', y=['Overall Restriction Germany', 'Overall Restriction '+country_input])
     fig.update_layout(title_text='MEAN of all Policy Measures')
+=======
+    fig = px.line(df_1_mean, x='date', y=['Restriction_Germany', 'Restriction_'+country_input], template="seaborn")
+
+>>>>>>> Stashed changes
     return fig
 
 
