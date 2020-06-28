@@ -219,9 +219,7 @@ def build_bargraph(country_input, input_date_range):
     # print(df_merge1)
 
     df_merge1 = pd.DataFrame(df_merge1)
-    # fig = px.line(df_merge1, x='date', y=['new_cases_Germany','new_deaths_Germany','new_cases_'+country_input,'new_deaths_'+country_input],
-    #               height=720, width=980, title='Comparing COVID cases of '+country_input+' against Germany',
-    #               template='plotly_dark')
+
     print(df_merge1.info())
 
     fig = go.Figure(data=[
@@ -369,12 +367,13 @@ def build_graph_mean(country_input, govt_rest):
     df_merge_mean['meanGermany'] = df_merge_mean['meanGermany'].fillna(0)
     df_merge_mean['meanCountry'] = df_merge_mean['meanCountry'].fillna(0)
 
-    # print(df_merge_mean['meanGermany'])
+    df_merge_mean = df_merge_mean.rename(
+        {'meanGermany': 'Overall_Restriction_Germany', 'meanCountry': 'Overall_Restriction_' + country_input}, axis=1)
 
     new_df_mean = pd.DataFrame(df_merge_mean)
     df_1_mean = pd.DataFrame(new_df_mean)
 
-    fig = px.line(df_1_mean, x='date', y=['meanGermany', 'meanCountry'])
+    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input])
 
     return fig
 
