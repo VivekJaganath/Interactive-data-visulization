@@ -79,8 +79,8 @@ app.layout = html.Div([
     html.Div([
             
         html.Div([
-            html.Label(['Choose Date:'], style={
-            'font-weight': 'bold', "text-align": "left"}),
+            html.Label(['Date Slider limits the data for chosen dates and is applicable to all the shown graphs. Please choose a date:'], style={
+             "text-align": "left"}),
             dcc.RangeSlider(id='slider_date',
                         min=date_num_encoder[0],  # the first date
                         max=date_num_encoder[-4],  # the last date
