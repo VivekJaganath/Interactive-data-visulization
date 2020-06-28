@@ -300,7 +300,7 @@ app.layout = html.Div([
                 'background-color':'white',
                 }),  
     html.Div([
-        html.H1("Comparison of Important Policy Milestones with Germany", className='twelve columns', style={'textAlign': 'center',
+        html.H1("Important Policy Milestones", className='twelve columns', style={'textAlign': 'center',
                 'height':'30px',
                 'font-size':'30px',
                 'background-color':'white',
@@ -396,12 +396,20 @@ def build_graph(country_input, input_date_range):
     # print(df_merge.to_string())
     df_merge = pd.DataFrame(df_merge)
 
-    fig = px.line(df_merge, x='date', y=["total_cases_Germany", "total_deaths_Germany", "total_recovery_Germany",
-                                         "total_cases_" + country_input, "total_deaths_" + country_input,
-                                         "total_recovery_" + country_input],
-                  title='Comparing COVID cases of ' + country_input + ' against Germany', template='seaborn')
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(x=df_merge['date'], y=df_merge["total_cases_Germany"], name="Total affected Germany"))
+    fig.add_trace(go.Scatter(x=df_merge['date'], y=df_merge["total_deaths_Germany"], name="Total death Germany"))
+    fig.add_trace(go.Scatter(x=df_merge['date'], y=df_merge["total_recovery_Germany"], name="Total recovered Germany"))
+    fig.add_trace(go.Scatter(x=df_merge['date'], y=df_merge["total_deaths_" + country_input],
+                             name="Total affected " + country_input))
+    fig.add_trace(go.Scatter(x=df_merge['date'], y=df_merge["total_deaths_" + country_input],
+                             name="Total death " + country_input))
+    fig.add_trace(go.Scatter(x=df_merge['date'], y=df_merge["total_deaths_" + country_input],
+                             name="Total recovered " + country_input))
 
-    fig.update_layout(title=dict(font=dict(size=20)))
+    fig.update_layout(title_text='Comparing COVID cases of ' + country_input + ' against Germany',
+                      title=dict(font=dict(size=20)), xaxis_title='Date', yaxis_title='Cases')
+
     fig_bar_graph = go.Figure(data=[
         go.Bar(name='Total tests in Germany', x=df_merge['date'], y=df_merge['total_tests_Germany'],
                marker_color='crimson'),
@@ -409,7 +417,7 @@ def build_graph(country_input, input_date_range):
                marker_color='rgb(26, 118, 255)')
     ])
     fig_bar_graph.update_layout(title_text='Comparing COVID tests of ' + country_input + ' against Germany',
-                                title=dict(font=dict(size=20)))
+                                title=dict(font=dict(size=20)), xaxis_title='Date', yaxis_title='Cases')
     return fig, fig_bar_graph
 
 @app.callback(
@@ -434,14 +442,17 @@ def build_bargraph(country_input, input_date_range):
     print(df_merge1.info())
 
     fig = go.Figure(data=[
-        go.Bar(name='new_cases_of_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
-        go.Bar(name='new_cases_' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
+        go.Bar(name='New cases in Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
+        go.Bar(name='New cases in ' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
     ])
+    fig.update_layout(title_text='Comparing new cases in ' + country_input + ' against Germany',
+                      xaxis_title='Date', yaxis_title='Cases')
     fig1 = go.Figure(data=[
-        go.Bar(name='new_deaths_Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
-        go.Bar(name='new_deaths_' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
-
+        go.Bar(name='New deaths in Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
+        go.Bar(name='New deaths in ' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
     ])
+    fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
+                       xaxis_title='Date', yaxis_title='Cases')
 
     return fig, fig1
 
@@ -506,8 +517,8 @@ def drawLinegraph(Dframe, x, country):
     c = x + country
     fig = px.line(Dframe, x='date',
                   y=[b, c],
-                  height=400, width=600,
-                  title='Comparing ' + x + ' of ' + country + ' against Germany')
+                  height=450, width=675,
+                  title='Comparing ' + x + country + ' against Germany')
     return fig
 
 
@@ -567,7 +578,9 @@ def build_graph_mean(country_input, govt_rest):
     new_df_mean = pd.DataFrame(df_merge_mean)
     df_1_mean = pd.DataFrame(new_df_mean)
 
-    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input])
+    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_' + country_input],
+                  height=450, width=675,
+                  title='Comparing overall restrictions of ' + country_input + ' against Germany')
 
     return fig
 
