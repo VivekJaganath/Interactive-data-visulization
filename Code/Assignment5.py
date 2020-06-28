@@ -10,7 +10,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 import xlrd
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['styles.css']
 
 govern_measures_data_file = "datasets/acaps_covid19_government_measures_dataset_0.xlsx"
 
@@ -74,53 +74,155 @@ data_table_visulaization_df = euro_government_measureDF.filter(
 
 colors = {
     'background': '#F0FFFF',
-    'text': '#7FDBFF'
+    'text': '#7FDBFF',
+    'black':'#3b3a30',
+    'white':'#FFFFFF'
 }
 
 app.layout = html.Div([
     html.H1("IDV Mini-Project COVID-19",
             style={
+                'background-color': colors['black'],
                 'textAlign': 'center',
-                'color': colors['text']
+                'color': colors['white'],
+                'height':'120px',
+                'font-size':'80px',
+                'font-family':'Comic Sans MS',
+                'margin-bottom':'50px'
             }),
     html.Div([dcc.Graph(id='the_graph'),
-              ], className='nine columns'),
+              ], className='twelve columns', style={'box-shadow':'0px 9px 5px #888888','width':'1680px',
+              'display' : 'block','margin-left': '4%'}),
     html.Div([
         html.Label(['Choose cases:'], style={
-             'font-weight': 'bold', "text-align": "left"}),
-        dcc.Dropdown(id='cases',
+            'background-color':'white', 'margin-left':'10px',
+             'font-weight': 'bold','font-size':'25px','width':'390px'}),
+        dcc.RadioItems(id='cases',
                      options=[{'label': 'Confirmed', 'value': 'C'}, {'label': 'Death', 'value': 'D'},
                               {'label': 'Recovered', 'value': 'R'}],
-                     value='C', clearable=True, searchable=True,
-                     placeholder='Choose Cases...', style={'height': '30px', 'width': '200px'})
-    ], className='two columns'),
+                     value='C', style={'position':'relative', 'margin-left':'10px',
+                     'background-color':'white',
+                     'height': '150px','width':'390px','font-size':'25px'}),
+        dcc.Textarea(
+        id='textarea-example',
+        value='Description of the Graph should be here',
+        readOnly='readOnly',
+        draggable='false',
+        disabled='true',
+        style={'border-color':'white','width': '400px', 'height':'530px','maxLength':'530px', 'minLength':'530px', 'box-shadow':'0px 9px 5px #888888', },
+    )
+    ], className='two columns', style={'margin-left':'10px','background-color':'white','width':'400px'}),
+    html.Div(className='twelve columns', style={'height':'100px'}),
+
+
+    ##Trend Graphs##
+    html.Div(
+        [html.Div([
+        html.H1("",style={'textAlign': 'center',
+                'height':'10px',
+                'background-color':'white',
+                }),
+        
     html.Div([
-        html.Label(['Choose country:'], style={
-             'font-weight': 'bold', "text-align": "left"}),
+        html.H1("Comparison of general trends", className='twelve columns', style={'textAlign': 'center',
+                'height':'60px',
+                'font-size':'40px',
+                'background-color':'white',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'})], 
+                style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
+                }),
+        #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+            ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
+            'height':'70px'}),
+    html.Hr(style={'margin-top':'70px','margin-left':'4%','float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+    html.Div([
+        dcc.Graph(id='line_graph'),
+    ],
+        style={'float':'left','background-color':'white','height':'720px', 'width':'50%',
+              'margin-bottom':'2%'}),
+    html.Div(
+        style={'float':'left','background-color':'white','height':'720px', 'width':'49%',
+              'margin-bottom':'2%'}),
+    ],
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1000px',
+    'margin-left':'4%','margin-right':'4%',}),          
+    ##Trend Graphs##
+    html.Div(className='twelve columns', style={'height':'100px'}),
+    ##Comparison Graphs##
+    html.Div(
+        [html.Div([
+        html.H1("",style={'textAlign': 'center',
+                'height':'10px',
+                'background-color':'white',
+                }),
+        
+    html.Div([
+        html.H1("Comparison of European Nations with Germany", className='twelve columns', style={'textAlign': 'center',
+                'height':'60px',
+                'font-size':'40px',
+                'background-color':'white',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'})], 
+                style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
+                }),
+        #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+        html.H6("Select the Country to compare with Germany",style={'float':'left','margin-top':'10px','margin-bottom':'10px',
+                     'margin-left':'24%','height': '30px', 'width': '400px','text-align':'center'}),
+        html.H6("Select the Policy Measure",style={'float':'right','margin-top':'10px','margin-bottom':'10px',
+                     'margin-right':'28%','height': '30px', 'width': '400px','text-align':'center'}),
         dcc.Dropdown(id='country',
                      options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
                               ['country'].unique()], value='Albania', clearable=True, searchable=True,
-                     placeholder='Choose Country...', style={'height': '40px', 'width': '1500px'},),
+                     placeholder='Choose Country...', style={'float':'left',
+                     'margin-left':'20%','height': '40px', 'width': '400px'}),
         dcc.Dropdown(id='GovtRestriction',
                                options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
                                ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
-                               placeholder='Choose restriction...', style={'height': '40px', 'width': '1500px'}, )
-    ], className='ten columns'),
-    html.Div([
-        dcc.Graph(id='line_graph'),
-
-    ], className='four columns'),
-html.Div([dcc.Graph(id='bar_graph'),
+                               placeholder='Choose restriction...', style={'float':'right',
+                               'height': '40px', 'width': '400px','margin-right':'20%'})
+            ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
+            'height':'150px'}),
+    html.Hr(style={'margin-top':'70px','margin-left':'4%','float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+    html.Div([dcc.Graph(id='bar_graph'),
               html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
-
-              ], className='five columns'),
-html.Div([
-        dcc.Graph(id='line_graph1'),
-
-    ], className='four columns'),
-
+              ],
+        style={'float':'left','background-color':'white','height':'720px', 'width':'49%',
+              'margin-bottom':'2%'}),
     html.Div([
-        dash_table.DataTable(
+        dcc.Graph(id='line_graph1'),
+    ],
+        style={'float':'left','background-color':'white','height':'720px', 'width':'50%',
+              'margin-bottom':'2%'})],
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1000px',
+    'margin-left':'4%','margin-right':'4%',}),          
+    ##Comparison Graphs##
+
+    ##Milestone Comparison##
+    html.Div(className='twelve columns', style={'height':'100px'}),
+
+     html.Div([
+        html.Div([
+        html.H1("",style={'textAlign': 'center',
+                'height':'10px',
+                'background-color':'white',
+                }),  
+    html.Div([
+        html.H1("Comparison of Important Policy Milestones", className='twelve columns', style={'textAlign': 'center',
+                'height':'60px',
+                'font-size':'40px',
+                'background-color':'white',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'})], 
+                style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
+                }),
+        #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+            ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
+            'height':'80px'}),
+    html.Hr(style={'margin-top':'70px','margin-left':'4%','float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+
+
+    dash_table.DataTable(
              id='data_table',
              columns=[{"name": i, "id": i}
                       for i in data_table_visulaization_df.columns],
@@ -149,20 +251,32 @@ html.Div([
                  'whiteSpace': 'normal',
                  'height': 'auto'
              },
+             style_table={
+                 'float':'left',
+                 'margin-left':'5%',
+                 'width': '90%',
+                'minWidth': '90%'
+             },
              fixed_rows={'headers': True},
              css=[{
                  'selector': '.dash-spreadsheet td div',
                  'rule': '''
                     line-height: 15px;
+                    ,
                     max-height: 30px; min-height: 30px; height: 30px;
-                    display: block;
+                    display: inline-block;
                     overflow-y: hidden;
                 '''
              }],
              tooltip_duration=None,
              )
-    ], className='eleven columns')
+    ], className='eleven columns', style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white',
+    'height':'800px','margin-left':'4%','margin-right':'4%'}),  
+
+    html.Div(className='twelve columns', style={'height':'100px'})
+
     ])
+    ##Milestone Comparison##
 # ----------------
 
 
@@ -184,12 +298,11 @@ def build_graph(country_input):
     fig = px.line(df_merge, x='date', y=["total_cases_Germany", "total_deaths_Germany", "total_recovery_Germany",
                                          "total_cases_"+country_input, "total_deaths_"+country_input,
                                          "total_recovery_"+country_input],
-                  height=720, width=980, title='Comparing COVID cases of '+country_input+' against Germany',
-                  template='plotly_dark')
+                  height=720,title='Comparing COVID cases of '+country_input+' against Germany')
     fig.update_layout(title=dict(font=dict(size=20)))
     return fig
 
-#Items from DataSet1 and DataSet2
+#Items from DataSet1 and DataSet2   
 @app.callback(
     [Output('line_graph1', 'figure'),
      Output('bar_graph', 'figure')],
@@ -216,74 +329,65 @@ def build_graph1(country_input,govt_rest):
     if govt_rest == 'School closing':
         fig = px.line(df_1, x='date',
                       y=['SchoolClosing_Germany','SchoolClosing_' + country_input],
-                      height=720, width=980, title='Comparing school closure of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing school closure of ' + country_input + ' against Germany'
+                      )
 
         fig1 = px.bar(df_1, x='date',
                       y=['SchoolClosing_Germany',
                          'SchoolClosing_' + country_input],
-                      height=720, width=980, title='Comparing school closure of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing school closure of ' + country_input + ' against Germany'
+                      )
         return fig,fig1
     elif govt_rest == 'Workplace closing' :
         fig = px.line(df_1, x='date',
                       y=['WorkPlaceClosing_Germany', 'WorkPlaceClosing_' + country_input],
-                      height=720, width=980, title='Comparing work place closure of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing work place closure of ' + country_input + ' against Germany')
 
         fig1 = px.bar(df_1, x='date',
                       y=['WorkPlaceClosing_Germany',
                          'WorkPlaceClosing_' + country_input],
-                      height=720, width=980, title='Comparing work place closure of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing work place closure of ' + country_input + ' against Germany')
         return fig, fig1
     elif govt_rest == 'Stay at home requirements' :
         fig = px.line(df_1, x='Date',
                       y=['StayHomeRestriction_Germany', 'StayHomeRestriction_' + country_input],
-                      height=720, width=980, title='Comparing stay at home restrictions of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700, title='Comparing stay at home restrictions of ' + country_input + ' against Germany'
+                      )
 
         fig1 = px.bar(df_1, x='date',
                       y=['StayHomeRestriction_Germany',
                          'StayHomeRestriction_' + country_input],
-                      height=720, width=980, title='Comparing stay at home restrictions of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing stay at home restrictions of ' + country_input + ' against Germany')
         return fig, fig1
     elif govt_rest == 'Restrictions on gatherings':
         fig = px.line(df_1, x='date',
                       y=['GatherRestriction_Germany', 'GatherRestriction_' + country_input],
-                      height=720, width=980, title='Comparing public gathering restriction of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing public gathering restriction of ' + country_input + ' against Germany')
 
         fig1 = px.bar(df_1, x='date',
                       y=['GatherRestriction_Germany',
                          'GatherRestriction_' + country_input],
-                      height=720, width=980, title='Comparing public gathering restriction of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing public gathering restriction of ' + country_input + ' against Germany')
         return fig, fig1
     elif govt_rest == 'Close public transport':
         fig = px.line(df_1, x='date',
                       y=['TransportRestriction_Germany', 'TransportRestriction_' + country_input],
-                      height=720, width=980, title='Comparing Internal transport restriction of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing Internal transport restriction of ' + country_input + ' against Germany')
 
         fig1 = px.bar(df_1, x='date',
                       y=['TransportRestriction_Germany',
                          'TransportRestriction_' + country_input],
-                      height=720, width=980, title='Comparing Internal transport restriction of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing Internal transport restriction of ' + country_input + ' against Germany')
         return fig, fig1
     elif govt_rest == 'International travel controls':
         fig = px.line(df_1, x='date',
                       y=['InternationalTravelRestriction_Germany', 'InternationalTravelRestriction_' + country_input],
-                      height=720, width=980, title='Comparing International travel restriction of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing International travel restriction of ' + country_input + ' against Germany')
 
         fig1 = px.bar(df_1, x='date',
                       y=['InternationalTravelRestriction_Germany',
                          'InternationalTravelRestriction_' + country_input],
-                      height=720, width=980, title='Comparing International travel restriction of ' + country_input + ' against Germany',
-                      template='plotly_dark')
+                      height=700,title='Comparing International travel restriction of ' + country_input + ' against Germany')
         return fig,fig1
 
 
@@ -302,7 +406,7 @@ def build_map(case):
     fig_map = px.choropleth(data_frame=df_merged, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
                             projection="natural earth", color_continuous_scale=px.colors.sequential.Rainbow,
-                            title='Total COVID-19 Cases Across Europe', width=1500, height=720)  # , template='plotly_dark')
+                            title='Total COVID-19 Cases Across Europe', width=1680, height=720)  # , template='plotly_dark')
 
     fig_map.update_layout(title=dict(font=dict(size=20)))
     return fig_map
