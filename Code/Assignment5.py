@@ -386,7 +386,7 @@ app.layout = html.Div([
                 page_size=10,  # we have less data in this example, so setting to 20
                 # style_table={'height': '300px', 'overflowY': 'auto'},
                 style_header={
-                    'backgroundColor': 'rgb(89, 168, 77)',
+                    'backgroundColor': 'rgb(255, 79, 70)',
                     'fontWeight': 'bold',
                     'color': '#FFFFFF',
                     'border': '1px solid black'
@@ -394,7 +394,7 @@ app.layout = html.Div([
                 style_data_conditional=[
                     {
                         'if': {'row_index': 'odd'},
-                        'backgroundColor': 'rgb(203, 237, 189)'
+                        'backgroundColor': 'rgb(255, 185, 180)'
                     }
                 ],
                 style_data={
@@ -494,9 +494,9 @@ def build_bargraph(country_input, input_date_range,gtype):
 
     df_per_country1 = df_merged_filtered[(df_merged_filtered['country'] == country_input)]
     df_per_country1 = df_per_country1.rename(
-        {'new_cases': 'new_cases_' + country_input, 'new_deaths': 'new_deaths_' + country_input}, axis=1)
+        {'new_cases': 'New cases ' + country_input, 'new_deaths': 'New deaths ' + country_input}, axis=1)
     df_germany1 = df_merged_filtered[(df_merged_filtered['country'] == "Germany")]
-    df_germany1 = df_germany1.rename({'new_cases': 'new_cases_Germany', 'new_deaths': 'new_deaths_Germany'}, axis=1)
+    df_germany1 = df_germany1.rename({'new_cases': 'New cases Germany', 'new_deaths': 'New deaths Germany'}, axis=1)
     df_merge1 = pd.merge(df_germany1, df_per_country1, on='date')
     # print(df_merge1)
 
@@ -505,22 +505,22 @@ def build_bargraph(country_input, input_date_range,gtype):
     #print(df_merge1.info())
     if gtype == "B":
         fig = go.Figure(data=[
-        go.Bar(name='New cases in Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
-        go.Bar(name='New cases in ' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
+        go.Bar(name='New cases in Germany', x=df_merge1['date'], y=df_merge1['New cases Germany']),
+        go.Bar(name='New cases in ' + country_input, x=df_merge1['date'], y=df_merge1['New cases ' + country_input])
     ])
         fig.update_layout(title_text='Comparing new cases in ' + country_input + ' against Germany',
                       xaxis_title='Date', yaxis_title='Cases')
         fig1 = go.Figure(data=[
-        go.Bar(name='New deaths in Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
-        go.Bar(name='New deaths in ' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
+        go.Bar(name='New deaths in Germany', x=df_merge1['date'], y=df_merge1['New deaths Germany']),
+        go.Bar(name='New deaths in ' + country_input, x=df_merge1['date'], y=df_merge1['New deaths ' + country_input])
     ])
         fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
                        xaxis_title='Date', yaxis_title='Cases')
 
         return fig, fig1
     else:
-        fig = px.line(df_merge1,x=df_merge1['date'],y=['new_cases_Germany','new_cases_' + country_input],title='Comparing new cases of '+country_input+' against Germany')
-        fig1 = px.line(df_merge1, x=df_merge1['date'], y=['new_deaths_Germany', 'new_deaths_' + country_input],
+        fig = px.line(df_merge1,x=df_merge1['date'],y=['New cases Germany','New cases ' + country_input],title='Comparing new cases of '+country_input+' against Germany')
+        fig1 = px.line(df_merge1, x=df_merge1['date'], y=['New deaths Germany', 'New deaths ' + country_input],
                       title='Comparing  new deaths of ' + country_input + ' against Germany')
         return fig,fig1
 
