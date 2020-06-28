@@ -501,11 +501,14 @@ def build_bargraph(country_input, input_date_range):
 @app.callback(
     Output('line_graph1', 'figure')
     ,
-    [Input('country', 'value'), Input("GovtRestriction", "value")],
-)
-def build_graph1(country_input, govt_rest):
-    German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
-    Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
+    [Input('country', 'value'),
+    Input("GovtRestriction", "value"),
+    Input('slider_date', 'value')])
+def build_graph1(country_input, govt_rest, input_date_range):
+
+    filtered_Dataset1 = dh.handle_updated_dates(DataSet1, 'date', input_date_range, number_date_range_dict)
+    German_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == "Germany")]
+    Country_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == country_input)]
     German_data = German_data.rename(
         {'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
          'C6_Stay at home requirements': 'StayHomeRestriction_Germany',
@@ -564,13 +567,16 @@ def drawLinegraph(Dframe, x, country):
 
 
 @app.callback(
-    Output('bar_graph_mean', 'figure')
-    ,
-    [Input('country', 'value'), Input("GovtRestriction", "value")],
+    Output('bar_graph_mean', 'figure'),
+    [Input('country', 'value'),
+    Input("GovtRestriction", "value"),
+    Input('slider_date', 'value')],
 )
-def build_graph_mean(country_input, govt_rest):
-    German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
-    Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
+def build_graph_mean(country_input, govt_rest, input_date_range):
+
+    filtered_Dataset1 = dh.handle_updated_dates(DataSet1, 'date', input_date_range, number_date_range_dict)
+    German_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == "Germany")]
+    Country_data = filtered_Dataset1[(filtered_Dataset1['CountryName'] == country_input)]
     German_data = German_data.rename(
         {'C1_School closing': 'SchoolClosing_Germany', 'C2_Workplace closing': 'WorkPlaceClosing_Germany',
          'C6_Stay at home requirements': 'StayHomeRestriction_Germany',
@@ -637,8 +643,6 @@ def build_map(case, input_date_range):
         case_chosen = 'total_deaths'
     else:
         case_chosen = 'total_cases'
-
-
 
     fig_map = px.choropleth(data_frame=df_merged_date_filtered, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
