@@ -62,7 +62,8 @@ colors = {
 app.layout = html.Div([
     html.H1("IDV Mini-Project COVID-19",
             style={
-                'background': 'linear-gradient(#bccef7, 5%, #3e71bd, 90%, #bccef7)',
+                #'background': 'linear-gradient(#bccef7, 5%, #3e71bd, 90%, #bccef7)',
+                'background-color':'#3e71bd',
                 'textAlign': 'center',
                 'color': colors['white'],
                 'height':'75px',
