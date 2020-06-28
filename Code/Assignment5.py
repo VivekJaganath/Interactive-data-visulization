@@ -12,7 +12,7 @@ import plotly.graph_objects as go
 import xlrd
 from plotly.validators.layout import _plot_bgcolor
 
-####### Initializing the data files and preparing sanitized dataframe ######
+external_stylesheets = ['styles.css']
 
 # Data Files
 # Source : https://www.acaps.org/covid19-government-measures-dataset
@@ -60,121 +60,209 @@ app.title = "IDV Mini-Project-COVID"
 
 colors = {
     'background': '#F0FFFF',
-    'text': '#7FDBFF'
+    'text': '#7FDBFF',
+    'black':'#3b3a30',
+    'white':'#FFFFFF'
 }
 
 app.layout = html.Div([
     html.H1("IDV Mini-Project COVID-19",
             style={
+                'background-color': colors['black'],
                 'textAlign': 'center',
-                'color': colors['text']
+                'color': colors['white'],
+                'height':'120px',
+                'font-size':'80px',
+                'font-family':'Comic Sans MS',
+                'margin-bottom':'50px'
             }),
     html.Div([dcc.Graph(id='the_graph'),
-              ], className='nine columns'),
+              ], className='twelve columns', style={'box-shadow':'0px 9px 5px #888888','width':'1680px',
+              'display' : 'block','margin-left': '4%'}),
     html.Div([
         html.Label(['Choose cases:'], style={
-            'font-weight': 'bold', "text-align": "left"}),
-        dcc.Dropdown(id='cases',
+            'background-color':'white', 'margin-left':'10px',
+             'font-weight': 'bold','font-size':'25px','width':'390px'}),
+        dcc.RadioItems(id='cases',
                      options=[{'label': 'Confirmed', 'value': 'C'}, {'label': 'Death', 'value': 'D'},
                               {'label': 'Recovered', 'value': 'R'}],
-                     value='C', clearable=True, searchable=True,
-                     placeholder='Choose Cases...', style={'height': '30px', 'width': '200px'})
-    ], className='two columns'),
-    html.Div([
-        html.Label(['Choose Date:'], style={
-            'font-weight': 'bold', "text-align": "left"}),
-        dcc.RangeSlider(id='slider_date',
-                        min=date_num_encoder[0],  # the first date
-                        max=date_num_encoder[-1],  # the last date
-                        value=[date_num_encoder[0], date_num_encoder[0]],
-                        step=date_increamentor,
-                        marks={number: date.strftime('%Y-%m-%d') for number, date in number_date_range}
-                        )
-    ], className='ten columns'),
+                     value='C', style={'position':'relative', 'margin-left':'10px',
+                     'background-color':'white',
+                     'height': '150px','width':'390px','font-size':'25px'}),
+        dcc.Textarea(
+        id='textarea-example',
+        value='Description of the Graph should be here',
+        readOnly='readOnly',
+        draggable='false',
+        disabled='true',
+        style={'border-color':'white','width': '400px', 'height':'530px','maxLength':'530px', 'minLength':'530px', 'box-shadow':'0px 9px 5px #888888', },
+    )
+    ], className='two columns', style={'margin-left':'10px','background-color':'white','width':'400px'}),
+    html.Div(className='twelve columns', style={'height':'100px'}),
 
-    html.Div([
-        html.Label(['Choose country:'], style={
-            'font-weight': 'bold', "text-align": "left"}),
-        dcc.Dropdown(id='country',
-                     options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
-                     ['country'].unique()], value='Albania', clearable=True, searchable=True,
-                     placeholder='Choose Country...', style={'height': '40px', 'width': '1500px'}, ),
 
-        dcc.Dropdown(id='GovtRestriction',
-                     options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
-                     ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
-                     placeholder='Choose restriction...', style={'height': '40px', 'width': '1500px'}, ),
-        dcc.Dropdown(id='Type of Graph',
-                     options=[{'label': 'LineGraph', 'value': 'Line graph'}, {'label': 'BarGraph', 'value': 'Bar graph'}],
-                     value='Line graph', clearable=True, searchable=True,
-                     placeholder='Choose Graph Type...', style={'height': '30px', 'width': '200px'})
-    ], className='ten columns'),
+    ##Trend Graphs##
+    html.Div(
+        [html.Div([
+        html.H1("",style={'textAlign': 'center',
+                'height':'10px',
+                'background-color':'white',
+                }),
+        
+    html.Div([
+        html.H1("Comparison of general trends", className='twelve columns', style={'textAlign': 'center',
+                'height':'60px',
+                'font-size':'40px',
+                'background-color':'white',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'})], 
+                style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
+                }),
+        #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+            ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
+            'height':'70px'}),
+    html.Hr(style={'margin-top':'70px','margin-left':'4%','float':'left','width':'1900px','border-top':'3px solid #bbb'}),
     html.Div([
         dcc.Graph(id='line_graph'),
-    ], className='six columns'),
+    ],
+        style={'float':'left','background-color':'white','height':'720px', 'width':'50%',
+              'margin-bottom':'2%'}),
+    html.Div(
+        style={'float':'left','background-color':'white','height':'720px', 'width':'49%',
+              'margin-bottom':'2%'}),
+    ],
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1000px',
+    'margin-left':'4%','margin-right':'4%',}),          
+    ##Trend Graphs##
+    html.Div(className='twelve columns', style={'height':'100px'}),
+    ##Comparison Graphs##
+    html.Div(
+        [html.Div([
+        html.H1("",style={'textAlign': 'center',
+                'height':'10px',
+                'background-color':'white',
+                }),
+        
     html.Div([
-        dcc.Graph(id='bar_graph_cases'),
-
-    ], className='five columns'),
-    html.Div([
-        dcc.Graph(id='bar_graph_deaths'),
-
-    ], className='five columns'),
-    html.Div([
-        dcc.Graph(id='bar_graph_mean'),
-
-    ], className='five columns'),
+        html.H1("Comparison of European Nations with Germany", className='twelve columns', style={'textAlign': 'center',
+                'height':'60px',
+                'font-size':'40px',
+                'background-color':'white',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'})], 
+                style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
+                }),
+        #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+        html.H6("Select the Country to compare with Germany",style={'float':'left','margin-top':'10px','margin-bottom':'10px',
+                     'margin-left':'24%','height': '30px', 'width': '400px','text-align':'center'}),
+        html.H6("Select the Policy Measure",style={'float':'right','margin-top':'10px','margin-bottom':'10px',
+                     'margin-right':'28%','height': '30px', 'width': '400px','text-align':'center'}),
+        dcc.Dropdown(id='country',
+                     options=[{'label': x, 'value': x} for x in df_europe_cases.sort_values('country')
+                              ['country'].unique()], value='Albania', clearable=True, searchable=True,
+                     placeholder='Choose Country...', style={'float':'left',
+                     'margin-left':'20%','height': '40px', 'width': '400px'}),
+        dcc.Dropdown(id='GovtRestriction',
+                               options=[{'label': x, 'value': x} for x in DataSet1.sort_values('GovtRestriction')
+                               ['GovtRestriction'].unique()], value='School closing', clearable=True, searchable=True,
+                               placeholder='Choose restriction...', style={'float':'right',
+                               'height': '40px', 'width': '400px','margin-right':'20%'})
+            ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
+            'height':'150px'}),
+    html.Hr(style={'margin-top':'70px','margin-left':'4%','float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+    html.Div([dcc.Graph(id='bar_graph'),
+              html.Label([''], style={'font-weight': 'bold', "text-align": "left"}),
+              ],
+        style={'float':'left','background-color':'white','height':'720px', 'width':'49%',
+              'margin-bottom':'2%'}),
     html.Div([
         dcc.Graph(id='line_graph1'),
+    ],
+        style={'float':'left','background-color':'white','height':'720px', 'width':'50%',
+              'margin-bottom':'2%'})],
+    style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white','height':'1000px',
+    'margin-left':'4%','margin-right':'4%',}),          
+    ##Comparison Graphs##
 
-    ], className='four columns'),
+    ##Milestone Comparison##
+    html.Div(className='twelve columns', style={'height':'100px'}),
 
+     html.Div([
+        html.Div([
+        html.H1("",style={'textAlign': 'center',
+                'height':'10px',
+                'background-color':'white',
+                }),  
     html.Div([
-        dash_table.DataTable(
-            id='data_table',
-            columns=[{"name": i, "id": i}
-                     for i in data_table_visulaization_df.columns],
-            # data=data_table_visulaization_df.to_dict('records'),
-            page_size=20,  # we have less data in this example, so setting to 20
-            # style_table={'height': '300px', 'overflowY': 'auto'},
-            style_header={
-                'backgroundColor': 'rgb(230, 230, 230)',
-                'fontWeight': 'bold'
-            },
-            style_data_conditional=[
-                {
-                    'if': {'row_index': 'odd'},
-                    'backgroundColor': 'rgb(248, 248, 248)'
-                }
-            ],
-            style_data={
-                'whiteSpace': 'normal',
-                'height': 'auto',
-                'lineHeight': '15px'
-            },
+        html.H1("Comparison of Important Policy Milestones", className='twelve columns', style={'textAlign': 'center',
+                'height':'60px',
+                'font-size':'40px',
+                'background-color':'white',
+                'margin-bottom':'0px',
+                'font-family':'Comic Sans MS'})], 
+                style={'margin-left':'4%','margin-right':'4%','margin-bottom':'0px',
+                }),
+        #html.Hr(style={'float':'left','width':'1900px','border-top':'3px solid #bbb'}),
+            ], style={'background-color':'white', 'float':'left', 'margin-left':'4%','margin-right':'4%', 'width':'92%',
+            'height':'80px'}),
+    html.Hr(style={'margin-top':'70px','margin-left':'4%','float':'left','width':'1900px','border-top':'3px solid #bbb'}),
 
-            style_cell={
-                'minWidth': '30px', 'width': '50px', 'maxWidth': '240px',
-                'textAlign': 'left',
-                'whiteSpace': 'normal',
-                'height': 'auto'
-            },
-            fixed_rows={'headers': True},
-            css=[{
-                'selector': '.dash-spreadsheet td div',
-                'rule': '''
+
+    dash_table.DataTable(
+             id='data_table',
+             columns=[{"name": i, "id": i}
+                      for i in data_table_visulaization_df.columns],
+             # data=data_table_visulaization_df.to_dict('records'),
+             page_size=20,  # we have less data in this example, so setting to 20
+             #style_table={'height': '300px', 'overflowY': 'auto'},
+             style_header={
+                 'backgroundColor': 'rgb(230, 230, 230)',
+                 'fontWeight': 'bold'
+             },
+             style_data_conditional=[
+                 {
+                     'if': {'row_index': 'odd'},
+                     'backgroundColor': 'rgb(248, 248, 248)'
+                 }
+             ],
+             style_data={
+                 'whiteSpace': 'normal',
+                 'height': 'auto',
+                 'lineHeight': '15px'
+             },
+
+             style_cell={
+                 'minWidth': '30px', 'width': '50px', 'maxWidth': '240px',
+                 'textAlign': 'left',
+                 'whiteSpace': 'normal',
+                 'height': 'auto'
+             },
+             style_table={
+                 'float':'left',
+                 'margin-left':'5%',
+                 'width': '90%',
+                'minWidth': '90%'
+             },
+             fixed_rows={'headers': True},
+             css=[{
+                 'selector': '.dash-spreadsheet td div',
+                 'rule': '''
                     line-height: 15px;
+                    ,
                     max-height: 30px; min-height: 30px; height: 30px;
-                    display: block;
+                    display: inline-block;
                     overflow-y: hidden;
                 '''
-            }],
-            tooltip_duration=None,
-        )
-    ], className='eleven columns')
-])
+             }],
+             tooltip_duration=None,
+             )
+    ], className='eleven columns', style={'float':'left','box-shadow':'9px 9px 5px #888888','background-color':'white',
+    'height':'800px','margin-left':'4%','margin-right':'4%'}),  
 
+    html.Div(className='twelve columns', style={'height':'100px'})
 
+    ])
+    ##Milestone Comparison##
 # ----------------
 
 
@@ -210,7 +298,6 @@ def build_graph(country_input, input_date_range):
      Output('bar_graph_deaths', 'figure')],
     [Input('country', 'value'),
      Input('slider_date', 'value')])
-
 def build_bargraph(country_input, input_date_range):
     # Filtering the results based on input date range
     df_merged_filtered = dh.handle_updated_dates(df_merged, 'date', input_date_range, number_date_range_dict)
@@ -231,13 +318,11 @@ def build_bargraph(country_input, input_date_range):
         go.Bar(name='new_cases_of_Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
         go.Bar(name='new_cases_' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
     ])
-    fig.update_layout(title='Comparing new COVID cases ' + 'of ' + country_input + ' against Germany')
     fig1 = go.Figure(data=[
         go.Bar(name='new_deaths_Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='new_deaths_' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
 
     ])
-    fig1.update_layout(title='Comparing new COVID deaths ' + 'of ' + country_input + ' against Germany')
 
     return fig, fig1
 
@@ -246,9 +331,9 @@ def build_bargraph(country_input, input_date_range):
 @app.callback(
     Output('line_graph1', 'figure')
     ,
-    [Input('country', 'value'), Input("GovtRestriction", "value"),Input("Type of Graph","value")],
+    [Input('country', 'value'), Input("GovtRestriction", "value")],
 )
-def build_graph1(country_input, govt_rest,gType):
+def build_graph1(country_input, govt_rest):
     German_data = DataSet1[(DataSet1['CountryName'] == "Germany")]
     Country_data = DataSet1[(DataSet1['CountryName'] == country_input)]
     German_data = German_data.rename(
@@ -277,69 +362,39 @@ def build_graph1(country_input, govt_rest,gType):
     df_1 = pd.DataFrame(new_df)
     # df_2 = pd.DataFrame(new_df2)
     if govt_rest == 'School closing':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'SchoolClosing_', country_input)
-        else :
-            fig = drawBargraph(df_1, 'SchoolClosing_', country_input)
+        fig = drawLinegraph(df_1, 'SchoolClosing_', country_input)
 
         return fig
     elif govt_rest == 'Workplace closing':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'WorkPlaceClosing_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'WorkPlaceClosing_', country_input)
+        fig = drawLinegraph(df_1, 'WorkPlaceClosing_', country_input)
 
         return fig
     elif govt_rest == 'Stay at home requirements':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'StayHomeRestriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'StayHomeRestriction_', country_input)
-
+        fig = drawLinegraph(df_1, 'StayHomeRestriction_', country_input)
 
         return fig
     elif govt_rest == 'Restrictions on gatherings':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'GatherRestriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'GatherRestriction_', country_input)
+        fig = drawLinegraph(df_1, 'GatherRestriction_', country_input)
 
         return fig
     elif govt_rest == 'Close public transport':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'TransportRestriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'TransportRestriction_', country_input)
+        fig = drawLinegraph(df_1, 'TransportRestriction_', country_input)
 
         return fig
     elif govt_rest == 'International travel controls':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'InternationalTravelRestriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'InternationalTravelRestriction_', country_input)
-
+        fig = drawLinegraph(df_1, 'InternationalTravelRestriction_', country_input)
 
         return fig
     elif govt_rest == 'Restriction on Retail':
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'Retail_Restriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'Retail_Restriction_', country_input)
-
+        fig = drawLinegraph(df_1, 'Retail_Restriction_', country_input)
 
         return fig
     elif govt_rest == "Restriction on pharmacy":
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
+        fig = drawLinegraph(df_1, 'Grocery_Pharmacy_Restriction_', country_input)
 
         return fig
     elif govt_rest == "Restriction on park":
-        if gType == 'Line graph':
-            fig = drawLinegraph(df_1, 'Park_Restriction_', country_input)
-        else:
-            fig = drawBargraph(df_1, 'Park_Restriction_', country_input)
+        fig = drawLinegraph(df_1, 'Park_Restriction_', country_input)
 
         return fig
 
@@ -351,15 +406,6 @@ def drawLinegraph(Dframe, x, country):
                   y=[b, c],
                   height=720, width=980,
                   title='Comparing' + x + 'of ' + country + ' against Germany')
-    return fig
-
-def drawBargraph(Dframe, x, country):
-    b = x + 'Germany'
-    c = x + country
-    fig = go.Figure(data=[
-        go.Bar(name='new_cases_of_Germany', x=Dframe['date'], y=Dframe[b]),
-        go.Bar(name='new_cases_' + country, x=Dframe['date'], y=Dframe[c])
-    ])
     return fig
 
 
@@ -419,7 +465,7 @@ def build_graph_mean(country_input, govt_rest):
     new_df_mean = pd.DataFrame(df_merge_mean)
     df_1_mean = pd.DataFrame(new_df_mean)
 
-    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input],title='Comparing overall restriction imposed by ' + country_input + ' against Germany')
+    fig = px.line(df_1_mean, x='date', y=['Overall_Restriction_Germany', 'Overall_Restriction_'+country_input])
 
     return fig
 
