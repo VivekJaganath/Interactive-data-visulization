@@ -464,8 +464,8 @@ def build_graph(country_input, input_date_range):
     [Output('bar_graph_cases', 'figure'),
      Output('bar_graph_deaths', 'figure')],
     [Input('country', 'value'),
-     Input('slider_date', 'value')])
-def build_bargraph(country_input, input_date_range):
+     Input('slider_date', 'value'),Input('graphType','value')])
+def build_bargraph(country_input, input_date_range,gtype):
     # Filtering the results based on input date range
     df_merged_filtered = dh.handle_updated_dates(df_merged, 'date', input_date_range, number_date_range_dict)
 
@@ -480,21 +480,26 @@ def build_bargraph(country_input, input_date_range):
     df_merge1 = pd.DataFrame(df_merge1)
 
     #print(df_merge1.info())
-
-    fig = go.Figure(data=[
+    if gtype == "B":
+        fig = go.Figure(data=[
         go.Bar(name='New cases in Germany', x=df_merge1['date'], y=df_merge1['new_cases_Germany']),
         go.Bar(name='New cases in ' + country_input, x=df_merge1['date'], y=df_merge1['new_cases_' + country_input])
     ])
-    fig.update_layout(title_text='Comparing new cases in ' + country_input + ' against Germany',
+        fig.update_layout(title_text='Comparing new cases in ' + country_input + ' against Germany',
                       xaxis_title='Date', yaxis_title='Cases')
-    fig1 = go.Figure(data=[
+        fig1 = go.Figure(data=[
         go.Bar(name='New deaths in Germany', x=df_merge1['date'], y=df_merge1['new_deaths_Germany']),
         go.Bar(name='New deaths in ' + country_input, x=df_merge1['date'], y=df_merge1['new_deaths_' + country_input])
     ])
-    fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
+        fig1.update_layout(title_text='Comparing new deaths in ' + country_input + ' against Germany',
                        xaxis_title='Date', yaxis_title='Cases')
 
-    return fig, fig1
+        return fig, fig1
+    else:
+        fig = px.line(df_merge1,x=df_merge1['date'],y=['new_cases_Germany','new_cases_' + country_input],title='comparision of new cases of '+country_input+' against Germany')
+        fig1 = px.line(df_merge1, x=df_merge1['date'], y=['new_deaths_Germany', 'new_deaths_' + country_input],
+                      title='comparision of new deaths of ' + country_input + ' against Germany')
+        return fig,fig1
 
 
 # Items from DataSet1 and DataSet2
