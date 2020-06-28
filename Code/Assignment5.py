@@ -52,7 +52,7 @@ number_date_range_dict = dict(number_date_range)
 with open('europe_geo.json') as json_file:
     europe_geo_json = json.load(json_file)
 
-external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+external_stylesheets = ['Code/assets/styles.css']
 
 # app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
@@ -71,33 +71,49 @@ app.layout = html.Div([
                 'background-color': colors['black'],
                 'textAlign': 'center',
                 'color': colors['white'],
-                'height':'120px',
-                'font-size':'80px',
+                'height':'70px',
+                'width':'100%',
+                'max-width': '100%',
+                'font-size':'50px',
                 'font-family':'Comic Sans MS',
                 'margin-bottom':'50px'
-            }),
-    html.Div([dcc.Graph(id='the_graph'),
-              ], className='twelve columns', style={'box-shadow':'0px 9px 5px #888888','width':'1680px',
-              'display' : 'block','margin-left': '4%'}),
+    }),
     html.Div([
-        html.Label(['Choose cases:'], style={
-            'background-color':'white', 'margin-left':'10px',
-             'font-weight': 'bold','font-size':'25px','width':'390px'}),
+        html.Div([dcc.Graph(id='the_graph',style={'height':'400px'}),
+              ], className='twelve columns', style={'float':'left',
+              'max-width':'68%',
+              'height':'400px',
+              'max-height':'400px',
+              'display' : 'inline-block'}),
+    html.Div([
+        html.Label(['Choose cases:'], style={'float':'left',
+            'background-color':'white',
+            'font-weight': 'bold','font-size':'15px'}),
         dcc.RadioItems(id='cases',
                      options=[{'label': 'Confirmed', 'value': 'C'}, {'label': 'Death', 'value': 'D'},
                               {'label': 'Recovered', 'value': 'R'}],
-                     value='C', style={'position':'relative', 'margin-left':'10px',
+                     value='C', style={'float':'left', 'margin-left':'10px',
                      'background-color':'white',
-                     'height': '150px','width':'390px','font-size':'25px'}),
+                     'height': '100px',
+                     'width':'150px',
+                     #'max-width':'30%','font-size':'25px'
+                     }),
         dcc.Textarea(
         id='textarea-example',
         value='Description of the Graph should be here',
         readOnly='readOnly',
         draggable='false',
         disabled='true',
-        style={'border-color':'white','width': '400px', 'height':'530px','maxLength':'530px', 'minLength':'530px', 'box-shadow':'0px 9px 5px #888888', },
+        style={'background-color':'white','float':'left','border-color':'white', 'height':'250px', 'width':'400px'
+        },
     )
-    ], className='two columns', style={'margin-left':'10px','background-color':'white','width':'400px'}),
+    ], className='two columns', style={'height':'400px','float':'left','display' : 'inline-block','margin-left':'10px','background-color':'white','max-width':'30%'}),
+
+    ],style={'background-color':'white','max-width':'92%','height':'400px', 'margin-left':'4%','margin-rigth':'4%',
+    'box-shadow':'5px 5px 5px #888888'    
+    }),
+
+    
     html.Div(className='twelve columns', style={'height':'100px'}),
 
 
@@ -487,8 +503,8 @@ def build_map(case, input_date_range):
     fig_map = px.choropleth(data_frame=df_merged_date_filtered, geojson=europe_geo_json, locations='country',
                             scope="europe", color=case_chosen, hover_name='country', featureidkey='properties.name',
                             projection="miller", color_continuous_scale='reds',
-                            title='Total COVID-19 Cases Across Europe', width=1500,
-                            height=720)  # , template='plotly_dark')
+                            title='Total COVID-19 Cases Across Europe',
+                            height=400)  # , template='plotly_dark')
 
     fig_map.update_layout(title=dict(font=dict(size=20)))
     return fig_map
@@ -520,4 +536,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    app.run_server(debug=True)
+    app.run_server(debug=False)
