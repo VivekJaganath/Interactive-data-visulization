@@ -78,6 +78,33 @@ app.layout = html.Div([
                 'font-family':'Comic Sans MS',
                 'margin-bottom':'20px'
     }),
+
+    ##Slider##
+    html.Div([
+            
+        html.Div([
+            html.Label(['Choose Date:'], style={
+            'font-weight': 'bold', "text-align": "left"}),
+        dcc.RangeSlider(id='slider_date',
+                        min=date_num_encoder[0],  # the first date
+                        max=date_num_encoder[-1],  # the last date
+                        value=[date_num_encoder[0], date_num_encoder[0]],
+                        step=date_increamentor,
+                        marks={number: date.strftime('%Y-%m-%d') for number, date in number_date_range}, 
+                        )
+        ], style={'float':'left','background-color':'white','width':'92%',
+    'max-width':'92%','height':'60px',
+    'margin-left':'2%'})
+    ], style={'float':'left','background-color':'white','width':'92%',
+    'max-width':'92%','height':'80px',
+    'margin-left':'4%',
+    'box-shadow':'5px 5px 5px #888888'
+    }),
+    ##Slider##
+
+    ##Space Div##    
+    html.Div(className='twelve columns', style={'height':'50px'}),
+
     html.Div([
         html.Div([dcc.Graph(id='the_graph',style={'height':'600px'}),
               ], className='twelve columns', style={'float':'left',
@@ -110,21 +137,8 @@ app.layout = html.Div([
     ], className='two columns', style={'height':'400px','float':'left','display' : 'inline-block',
     'margin-left':'10px','background-color':'white','max-width':'30%'}),
     #############################
-    html.Div([
-        html.Label(['Choose Date:'], style={
-            'font-weight': 'bold', "text-align": "left"}),
-        dcc.RangeSlider(id='slider_date',
-                        min=date_num_encoder[0],  # the first date
-                        max=date_num_encoder[-1],  # the last date
-                        value=[date_num_encoder[0], date_num_encoder[0]],
-                        step=date_increamentor,
-                        marks={number: date.strftime('%Y-%m-%d') for number, date in number_date_range}
-                        )   
-    ], style={'float':'left','background-color':'white','width':'92%','max-width':'92%','height':'10px', 
-    'margin-left':'5%'
-    })
     
-    ],style={'background-color':'white','max-width':'92%','height':'520px', 'margin-left':'4%','margin-right':'4%',
+    ],style={'float':'left','display':'inline-block','background-color':'white','max-width':'92%','height':'520px', 'margin-left':'4%','margin-right':'4%',
     'box-shadow':'5px 5px 5px #888888'    
     }),
 
