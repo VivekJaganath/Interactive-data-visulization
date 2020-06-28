@@ -37,7 +37,7 @@ def read_data_covid_and_recovery(owid_covid_data_file, filename2):
     df_europe = df_world[search_df_europe]
     df_europe = df_europe.rename({'location': 'country'}, axis=1)
     df_europe_cases = df_europe.groupby(['date', 'country'])[
-        'total_cases', 'total_deaths'].max()
+        'total_cases', 'total_deaths','new_cases','new_deaths'].max()
     df_europe_cases = df_europe_cases.reset_index()
 
     # Normalizing the date and countries
