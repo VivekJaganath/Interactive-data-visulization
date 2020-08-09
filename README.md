@@ -1,4 +1,16 @@
-# miniproject
+# interactive-data-Visualization
+
+Python coding for covid-19 Visualization in Europe.
+
+In the month of January 2020, most of the European countries were affected by
+COVID-19. As there was not much information about COVID-19, for example
+- how it was transmitted, what measures needed to be taken to stop it‘s spread,
+etc., it was very hard for the European governments to formalize an approach
+to prevent the spread of COVID-19. In such a situation the German government
+came up with many measures to counter COVID-19. In this project, we are comparing the response of Germany with its European counterparts in aspects such
+as the closure of schools, home quarantine, tests, etc through visualization.
+
+
 
 ## INSTALL DEPENDENCIES
 a) If you are using **pip** for package management
